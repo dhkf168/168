@@ -1,0 +1,1960 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>客服人数统计</title>
+	  <link
+      rel="icon"
+      href="https://raw.githubusercontent.com/mubai16888/mb/main/mb.ico"
+      type="image/x-icon"
+    />
+    <link
+      rel="icon"
+      href="https://raw.githubusercontent.com/mubai16888/mb/main/mb.png"
+      type="image/png"
+      sizes="192x192"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+      }
+
+      :root {
+        --primary: #4361ee;
+        --secondary: #3f37c9;
+        --success: #4cc9f0;
+        --danger: #f72585;
+        --warning: #f8961e;
+        --info: #4895ef;
+        --dark: #212529;
+        --light: #f8f9fa;
+        --position-color-1: #4361ee;
+        --position-color-2: #4cc9f0;
+        --position-color-3: #f8961e;
+        --position-color-4: #f72585;
+        --position-color-5: #7209b7;
+        --position-color-6: #3a0ca3;
+        --position-color-7: #2ec4b6;
+        --position-color-8: #e71d36;
+      }
+
+      body {
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4e7ec 100%);
+        min-height: 100vh;
+        padding: 15px;
+        color: #2d3436;
+      }
+
+      .container {
+        max-width: 1800px;
+        margin: 0 auto;
+      }
+
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        margin-top: 5px;
+        padding: 12px 20px;
+        background: linear-gradient(135deg, #4361ee 0%, #3a0ca3 100%);
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        color: white;
+      }
+
+      h1 {
+        font-weight: 700;
+        color: white;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.5rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      }
+
+      .btn {
+        background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+        color: #4361ee;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.85rem;
+        box-shadow: 0 2px 6px rgba(255, 255, 255, 0.3);
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(255, 255, 255, 0.4);
+      }
+
+      .btn i {
+        font-size: 0.75rem;
+      }
+
+      .stats-bar {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+
+      .stat-card {
+        background: white;
+        padding: 15px;
+        border-radius: 10px;
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.06);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        transition: all 0.3s ease;
+        border-left: 4px solid var(--primary);
+      }
+
+      .stat-card:nth-child(2) {
+        border-left-color: var(--info);
+      }
+
+      .stat-card:nth-child(3) {
+        border-left-color: var(--success);
+      }
+
+      .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+      }
+
+      .stat-value {
+        font-size: 1.8rem;
+        font-weight: 800;
+        margin-bottom: 3px;
+        color: var(--primary);
+      }
+
+      .stat-card:nth-child(2) .stat-value {
+        color: var(--info);
+      }
+
+      .stat-card:nth-child(3) .stat-value {
+        color: var(--success);
+      }
+
+      .stat-label {
+        font-size: 0.8rem;
+        color: #6c757d;
+        text-align: center;
+      }
+
+      .modules-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 16px;
+      }
+
+      .module {
+        background: white;
+        border-radius: 12px;
+        padding: 15px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-top: 4px solid var(--primary);
+      }
+
+      .module:nth-child(4n + 1) {
+        border-top-color: var(--primary);
+      }
+
+      .module:nth-child(4n + 2) {
+        border-top-color: var(--info);
+      }
+
+      .module:nth-child(4n + 3) {
+        border-top-color: var(--success);
+      }
+
+      .module:nth-child(4n + 4) {
+        border-top-color: var(--warning);
+      }
+
+      .module:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      }
+
+      .module-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #f1f3f5;
+      }
+
+      .module-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #2c3e50;
+        cursor: pointer;
+        padding: 5px 8px;
+        border-radius: 5px;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .module-title:hover {
+        background: #f8f9fa;
+      }
+
+      .module-title i {
+        font-size: 0.75rem;
+        color: #6c757d;
+        transition: transform 0.3s ease;
+        pointer-events: none;
+      }
+
+      .module-title.collapsed i {
+        transform: rotate(-90deg);
+      }
+
+      .module-actions {
+        display: flex;
+        gap: 5px;
+      }
+
+      .action-btn {
+        background: none;
+        border: none;
+        color: #7f8c8d;
+        cursor: pointer;
+        font-size: 0.85rem;
+        transition: all 0.3s;
+        padding: 5px;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+      }
+
+      .action-btn:hover {
+        color: var(--primary);
+        background: #f8f9fa;
+        transform: scale(1.05);
+      }
+
+      .positions-container {
+        margin-top: 10px;
+      }
+
+      .position {
+        margin-bottom: 12px;
+        background: #f8f9fb;
+        padding: 10px;
+        border-radius: 8px;
+        border-left: 3px solid var(--position-color-1);
+        transition: all 0.3s ease;
+      }
+
+      .position:nth-child(8n + 1) {
+        border-left-color: var(--position-color-1);
+      }
+
+      .position:nth-child(8n + 2) {
+        border-left-color: var(--position-color-2);
+      }
+
+      .position:nth-child(8n + 3) {
+        border-left-color: var(--position-color-3);
+      }
+
+      .position:nth-child(8n + 4) {
+        border-left-color: var(--position-color-4);
+      }
+
+      .position:nth-child(8n + 5) {
+        border-left-color: var(--position-color-5);
+      }
+
+      .position:nth-child(8n + 6) {
+        border-left-color: var(--position-color-6);
+      }
+
+      .position:nth-child(8n + 7) {
+        border-left-color: var(--position-color-7);
+      }
+
+      .position:nth-child(8n + 8) {
+        border-left-color: var(--position-color-8);
+      }
+
+      .position:hover {
+        transform: translateX(3px);
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+      }
+
+      .position-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        align-items: center;
+      }
+
+      .position-title {
+        font-weight: 600;
+        color: #34495e;
+        cursor: pointer;
+        padding: 4px 6px;
+        border-radius: 4px;
+        transition: all 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.95rem;
+      }
+
+      .position-title:hover {
+        background: #e8f4ff;
+      }
+
+      .position-title i {
+        font-size: 0.7rem;
+        color: #6c757d;
+        transition: transform 0.3s ease;
+        pointer-events: none;
+      }
+
+      .position-title.collapsed i {
+        transform: rotate(-90deg);
+      }
+
+      .position-actions {
+        display: flex;
+        gap: 5px;
+      }
+
+      .staff-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 8px;
+        min-height: 50px;
+        transition: all 0.3s ease;
+      }
+
+      .staff-member {
+        display: flex;
+        flex-direction: column;
+        padding: 8px;
+        background: white;
+        border-radius: 6px;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
+        transition: all 0.3s;
+        position: relative;
+        border-left: 2px solid var(--position-color-1);
+        cursor: pointer;
+      }
+
+      .staff-member:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+        border-left: 2px solid var(--secondary);
+      }
+
+      .staff-name {
+        font-weight: 600;
+        font-size: 0.85rem;
+        margin-bottom: 4px;
+        color: #2c3e50;
+        padding-right: 35px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .staff-roles {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-top: 4px;
+      }
+
+      .staff-role {
+        font-size: 0.7rem;
+        color: white;
+        padding: 2px 6px;
+        border-radius: 6px;
+        display: inline-block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 100%;
+      }
+
+      .staff-actions {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        display: flex;
+        gap: 4px;
+        z-index: 10;
+      }
+
+      .staff-btn {
+        background: #dfe6e9;
+        color: #636e72;
+        border: none;
+        width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        font-size: 0.6rem;
+        transition: all 0.3s;
+      }
+
+      .staff-btn:hover {
+        transform: scale(1.1);
+      }
+
+      .delete-btn {
+        background: var(--danger);
+        color: white;
+      }
+
+      .delete-btn:hover {
+        background: #e31266;
+      }
+
+      .empty-placeholder {
+        color: #adb5bd;
+        text-align: center;
+        padding: 10px;
+        font-style: italic;
+        font-size: 0.85rem;
+      }
+
+      /* 模态框样式 */
+      .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+      }
+
+      .modal-content {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        width: 90%;
+        max-width: 500px;
+        box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        animation: modalFadeIn 0.3s ease;
+      }
+
+      @keyframes modalFadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #f1f3f5;
+      }
+
+      .modal-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #2c3e50;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .close-btn {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #7f8c8d;
+        transition: color 0.3s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .close-btn:hover {
+        color: #34495e;
+      }
+
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      .form-group label {
+        display: block;
+        margin-bottom: 6px;
+        font-weight: 600;
+        color: #34495e;
+        font-size: 0.9rem;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #e0e6ed;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        transition: all 0.3s;
+        background: #f8f9fa;
+        -webkit-text-decoration: none !important;
+        text-decoration: none !important;
+      }
+
+      /* 禁止浏览器检查不提示下划线 */
+      textarea::-webkit-spelling-error,
+      input::-webkit-spelling-error {
+        text-decoration: none;
+      }
+
+      textarea:-moz-ui-invalid,
+      input:-moz-ui-invalid {
+        box-shadow: none;
+      }
+
+      .form-control:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        background: white;
+      }
+
+      textarea.form-control {
+        min-height: 80px;
+        resize: vertical;
+      }
+
+      .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-top: 15px;
+      }
+
+      /* 角色管理样式 */
+      .roles-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      .role-tag {
+        display: flex;
+        align-items: center;
+        background: #e9ecef;
+        padding: 4px 8px;
+        border-radius: 16px;
+        font-size: 0.8rem;
+        gap: 4px;
+      }
+
+      .role-tag span {
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      .role-remove {
+        background: none;
+        border: none;
+        cursor: pointer;
+        color: #6c757d;
+        font-size: 0.7rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+      }
+
+      .role-remove:hover {
+        background: #dee2e6;
+        color: #dc3545;
+      }
+
+      .role-input-group {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      .role-input {
+        flex: 1;
+      }
+
+      .add-role-btn {
+        background: var(--primary);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        padding: 0 12px;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+
+      .add-role-btn:hover {
+        background: var(--secondary);
+      }
+
+      /* 成员详情模态框 */
+      .staff-details-modal .modal-content {
+        max-width: 500px;
+      }
+
+      .staff-details {
+        padding: 15px 0;
+      }
+
+      .staff-detail-item {
+        margin-bottom: 15px;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .staff-detail-label {
+        font-weight: 600;
+        color: #34495e;
+        margin-bottom: 5px;
+        font-size: 0.9rem;
+      }
+
+      .staff-detail-value {
+        color: #2c3e50;
+        padding: 10px 12px;
+        background: #f8f9fa;
+        border-radius: 6px;
+        min-height: 42px;
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+
+      .staff-detail-value.editable {
+        background: white;
+        border: 1px solid #e0e6ed;
+        cursor: text;
+      }
+
+      /* 高亮样式 */
+      .highlight {
+        animation: highlight 2s ease;
+      }
+
+      @keyframes highlight {
+        0% {
+          background-color: rgba(255, 255, 0, 0.3);
+        }
+        100% {
+          background-color: transparent;
+        }
+      }
+
+      /* 折叠状态 */
+      .positions-container.collapsed {
+        display: none;
+      }
+
+      .staff-list.collapsed {
+        display: none;
+      }
+
+      @media (max-width: 1200px) {
+        .modules-container {
+          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        }
+      }
+
+      @media (max-width: 768px) {
+        header {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 10px;
+        }
+
+        .stats-bar {
+          grid-template-columns: 1fr;
+          gap: 10px;
+        }
+
+        .staff-list {
+          grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+        }
+
+        .module {
+          padding: 12px;
+        }
+
+        .role-input-group {
+          flex-direction: column;
+        }
+
+        .add-role-btn {
+          width: 100%;
+          padding: 8px;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .modules-container {
+          grid-template-columns: 1fr;
+        }
+
+        .staff-list {
+          grid-template-columns: repeat(2, 1fr);
+        }
+
+        body {
+          padding: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1><i class="fas fa-users-cog"></i> 客服人数统计</h1>
+        <button class="btn" id="add-module-btn">
+          <i class="fas fa-plus"></i> 添加小组
+        </button>
+      </header>
+
+      <div class="stats-bar">
+        <div class="stat-card">
+          <div class="stat-value">4</div>
+          <div class="stat-label">小组数量</div>
+        </div>
+
+        <!-- <div class="stat-card"> 
+          <div class="stat-value">8</div>
+          <div class="stat-label">岗位数量</div>
+        </div>
+        -->
+        <div class="stat-card">
+          <div class="stat-value">16</div>
+          <div class="stat-label">成员数量</div>
+        </div>
+      </div>
+
+      <div class="modules-container" id="modules-container">
+        <!-- 模块将通过JS动态添加 -->
+      </div>
+    </div>
+
+    <!-- 添加模块模态框 -->
+    <div class="modal" id="module-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title"><i class="fas fa-cube"></i> 添加小组</h2>
+          <button class="close-btn">&times;</button>
+        </div>
+        <div class="form-group">
+          <label for="module-name">小组名称</label>
+          <input
+            type="text"
+            id="module-name"
+            class="form-control"
+            placeholder="输入小组称"
+          />
+        </div>
+        <div class="form-actions">
+          <button class="btn" id="save-module">保存小组模块</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 添加岗位模态框 -->
+    <div class="modal" id="position-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">
+            <i class="fas fa-briefcase"></i> 添加新岗位
+          </h2>
+          <button class="close-btn">&times;</button>
+        </div>
+        <div class="form-group">
+          <label for="position-name">岗位名称</label>
+          <input
+            type="text"
+            id="position-name"
+            class="form-control"
+            placeholder="输入岗位名称"
+          />
+        </div>
+        <div class="form-actions">
+          <button class="btn" id="save-position">保存岗位</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 添加人员模态框 -->
+    <div class="modal" id="staff-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">
+            <i class="fas fa-user-plus"></i>
+            <span id="staff-modal-title">添加新成员</span>
+          </h2>
+          <button class="close-btn">&times;</button>
+        </div>
+        <div class="form-group">
+          <label for="staff-name">成员姓名</label>
+          <input
+            type="text"
+            id="staff-name"
+            class="form-control"
+            placeholder="输入成员姓名"
+          />
+        </div>
+        <div class="form-group">
+          <label>成员角色</label>
+          <div class="roles-container" id="roles-container">
+            <!-- 角色标签将在这里动态生成 -->
+          </div>
+          <div class="role-input-group">
+            <input
+              type="text"
+              id="role-input"
+              class="form-control role-input"
+              placeholder="输入角色名称"
+            />
+            <button class="add-role-btn" id="add-role-btn">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="staff-notes">备注</label>
+          <textarea
+            id="staff-notes"
+            class="form-control"
+            placeholder="输入备注信息"
+            rows="3"
+            spellcheck="false"
+          ></textarea>
+        </div>
+        <div class="form-actions">
+          <button class="btn" id="save-staff">保存成员</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 成员详情模态框 - 修改为表单形式 -->
+    <div class="modal staff-details-modal" id="staff-details-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">
+            <i class="fas fa-user"></i>
+            <span id="staff-details-title">成员详情</span>
+          </h2>
+          <button class="close-btn">&times;</button>
+        </div>
+        <div class="staff-details">
+          <div class="form-group">
+            <label for="detail-name">姓名</label>
+            <input
+              type="text"
+              id="detail-name"
+              class="form-control"
+              placeholder="输入成员姓名"
+            />
+          </div>
+          <div class="form-group">
+            <label>角色</label>
+            <div class="roles-container" id="detail-roles-container">
+              <!-- 角色标签将在这里动态生成 -->
+            </div>
+            <div class="role-input-group">
+              <input
+                type="text"
+                id="detail-role-input"
+                class="form-control role-input"
+                placeholder="输入角色名称"
+              />
+              <button class="add-role-btn" id="detail-add-role-btn">
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="detail-notes">备注</label>
+            <textarea
+              id="detail-notes"
+              class="form-control"
+              placeholder="输入备注信息"
+              rows="3"
+            ></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn" id="save-details">
+            <i class="fas fa-save"></i> 保存
+          </button>
+          <button class="btn" id="close-details">关闭</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 确认弹窗 -->
+    <div class="modal" id="confirm-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">
+            <i class="fas fa-exclamation-circle"></i> 确认操作
+          </h2>
+          <button class="close-btn">&times;</button>
+        </div>
+        <div class="form-group">
+          <p id="confirm-text">确定要执行此操作吗？</p>
+        </div>
+        <div class="form-actions">
+          <button class="btn" id="confirm-cancel">取消</button>
+          <button
+            class="btn"
+            id="confirm-ok"
+            style="
+              background: linear-gradient(135deg, #f72585 0%, #b5179e 100%);
+            "
+          >
+            确定
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 提示弹窗 -->
+    <div class="modal" id="alert-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title"><i class="fas fa-check-circle"></i> 提示</h2>
+          <button class="close-btn">&times;</button>
+        </div>
+        <div class="form-group">
+          <p id="alert-text">操作成功完成！</p>
+        </div>
+        <div class="form-actions">
+          <button class="btn" id="alert-ok">确定</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 输入弹窗 -->
+    <div class="modal" id="input-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title" id="input-title">
+            <i class="fas fa-edit"></i> 请输入
+          </h2>
+          <button class="close-btn">&times;</button>
+        </div>
+        <div class="form-group">
+          <input
+            type="text"
+            id="input-value"
+            class="form-control"
+            placeholder="请输入"
+          />
+        </div>
+        <div class="form-actions">
+          <button class="btn" id="input-save">保存</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // 示例数据
+      const sampleData = [
+        {
+          id: 1,
+          name: "技术研发部",
+          positions: [
+            {
+              id: 101,
+              name: "前端开发",
+              staff: [
+                {
+                  id: 1001,
+                  name: "张三",
+                  roles: ["高级工程师", "团队负责人"],
+                  notes: "负责前端架构设计和核心模块开发",
+                },
+                {
+                  id: 1002,
+                  name: "李四",
+                  roles: ["中级工程师"],
+                  notes: "负责业务模块开发和维护",
+                },
+                {
+                  id: 1003,
+                  name: "王五",
+                  roles: ["初级工程师", "实习生导师"],
+                  notes: "协助开发和学习成长",
+                },
+                {
+                  id: 1004,
+                  name: "赵六",
+                  roles: ["UI设计师", "用户体验专家"],
+                  notes: "负责界面设计和用户体验优化",
+                },
+              ],
+            },
+            {
+              id: 102,
+              name: "后端开发",
+              staff: [
+                {
+                  id: 1005,
+                  name: "陈七",
+                  roles: ["架构师", "技术总监"],
+                  notes: "系统架构设计和性能优化",
+                },
+                {
+                  id: 1006,
+                  name: "林八",
+                  roles: ["高级工程师"],
+                  notes: "核心业务逻辑开发",
+                },
+                {
+                  id: 1007,
+                  name: "黄九",
+                  roles: ["DevOps", "系统管理员"],
+                  notes: "负责CI/CD和运维工作",
+                },
+              ],
+            },
+          ],
+        },
+        {
+          id: 2,
+          name: "产品设计部",
+          positions: [
+            {
+              id: 201,
+              name: "UI设计",
+              staff: [
+                {
+                  id: 2001,
+                  name: "陈七",
+                  roles: ["设计主管", "创意总监"],
+                  notes: "设计团队管理和设计规范制定",
+                },
+                {
+                  id: 2002,
+                  name: "林八",
+                  roles: ["视觉设计师"],
+                  notes: "负责产品视觉设计和品牌形象",
+                },
+              ],
+            },
+            {
+              id: 202,
+              name: "产品经理",
+              staff: [
+                {
+                  id: 2003,
+                  name: "黄九",
+                  roles: ["产品总监", "战略规划"],
+                  notes: "产品战略规划和团队管理",
+                },
+                {
+                  id: 2004,
+                  name: "周十",
+                  roles: ["产品经理"],
+                  notes: "需求分析和产品设计",
+                },
+                {
+                  id: 2005,
+                  name: "吴十一",
+                  roles: ["产品助理", "用户研究员"],
+                  notes: "协助产品经理完成日常工作",
+                },
+              ],
+            },
+          ],
+        },
+        {
+          id: 3,
+          name: "市场营销部",
+          positions: [
+            {
+              id: 301,
+              name: "数字营销",
+              staff: [
+                {
+                  id: 3001,
+                  name: "郑十二",
+                  roles: ["营销主管", "数据分析师"],
+                  notes: "数字营销策略制定和执行",
+                },
+                {
+                  id: 3002,
+                  name: "王十三",
+                  roles: ["SEO专家", "内容策略师"],
+                  notes: "搜索引擎优化和流量增长",
+                },
+              ],
+            },
+            {
+              id: 302,
+              name: "内容创作",
+              staff: [
+                {
+                  id: 3003,
+                  name: "张十四",
+                  roles: ["内容总监", "编辑"],
+                  notes: "内容策略和团队管理",
+                },
+                {
+                  id: 3004,
+                  name: "李十五",
+                  roles: ["文案策划", "社交媒体经理"],
+                  notes: "内容创作和文案撰写",
+                },
+              ],
+            },
+          ],
+        },
+        {
+          id: 4,
+          name: "客户服务部",
+          positions: [
+            {
+              id: 401,
+              name: "客户支持",
+              staff: [
+                {
+                  id: 4001,
+                  name: "钱十六",
+                  roles: ["支持主管", "培训师"],
+                  notes: "客户支持团队管理和培训",
+                },
+                {
+                  id: 4002,
+                  name: "孙十七",
+                  roles: ["技术支持", "问题解决专家"],
+                  notes: "解决客户技术问题和提供支持",
+                },
+              ],
+            },
+            {
+              id: 402,
+              name: "客户成功",
+              staff: [
+                {
+                  id: 4003,
+                  name: "周十八",
+                  roles: ["成功经理", "客户关系管理"],
+                  notes: "客户关系维护和满意度提升",
+                },
+                {
+                  id: 4004,
+                  name: "吴十九",
+                  roles: ["客户代表", "需求分析师"],
+                  notes: "日常客户沟通和需求收集",
+                },
+              ],
+            },
+          ],
+        },
+      ];
+
+      let modules =
+        JSON.parse(localStorage.getItem("teamModules")) || sampleData;
+      let currentModuleId = null;
+      let currentPositionId = null;
+      let currentStaffId = null;
+      let confirmCallback = null;
+      let inputCallback = null;
+      let isEditingStaff = false;
+      let isEditingDetails = false;
+      let currentRoles = [];
+      let detailRoles = [];
+
+      // 初始化应用
+      function initApp() {
+        renderModules();
+        setupEventListeners();
+        updateStats();
+      }
+
+      // 生成角色颜色
+      function generateRoleColor(role) {
+        // 使用简单的哈希函数为角色生成一致的颜色
+        let hash = 0;
+        for (let i = 0; i < role.length; i++) {
+          hash = role.charCodeAt(i) + ((hash << 5) - hash);
+        }
+
+        // 使用HSL颜色模型，固定饱和度和亮度，只变化色相
+        const h = Math.abs(hash) % 360;
+        return `hsl(${h}, 70%, 45%)`;
+      }
+
+      // 显示确认弹窗
+      function showConfirm(message, callback) {
+        document.getElementById("confirm-text").textContent = message;
+        confirmCallback = callback;
+        document.getElementById("confirm-modal").style.display = "flex";
+      }
+
+      // 显示提示弹窗
+      function showAlert(message) {
+        document.getElementById("alert-text").textContent = message;
+        document.getElementById("alert-modal").style.display = "flex";
+      }
+
+      // 显示输入弹窗
+      function showInput(title, defaultValue, callback) {
+        document.getElementById(
+          "input-title"
+        ).innerHTML = `<i class="fas fa-edit"></i> ${title}`;
+        document.getElementById("input-value").value = defaultValue || "";
+        inputCallback = callback;
+        document.getElementById("input-modal").style.display = "flex";
+      }
+
+      // 更新统计信息
+      function updateStats() {
+        let moduleCount = modules.length;
+        let positionCount = 0;
+        let staffCount = 0;
+
+        modules.forEach((module) => {
+          positionCount += module.positions.length;
+          module.positions.forEach((position) => {
+            staffCount += position.staff.length;
+          });
+        });
+
+        document.querySelectorAll(".stat-value")[0].textContent = moduleCount;
+        // document.querySelectorAll(".stat-value")[1].textContent = positionCount;
+        document.querySelectorAll(".stat-value")[1].textContent = staffCount;
+      }
+
+      // 渲染所有模块
+      function renderModules() {
+        const modulesContainer = document.getElementById("modules-container");
+        modulesContainer.innerHTML = "";
+
+        modules.forEach((module) => {
+          const moduleEl = document.createElement("div");
+          moduleEl.className = "module";
+          moduleEl.setAttribute("data-module-id", module.id);
+
+          let positionsHTML = "";
+          module.positions.forEach((position) => {
+            let staffHTML = "";
+
+            if (position.staff.length === 0) {
+              staffHTML = `<div class="empty-placeholder">点击添加成员</div>`;
+            } else {
+              position.staff.forEach((person) => {
+                let rolesHTML = "";
+                if (person.roles && person.roles.length > 0) {
+                  person.roles.forEach((role) => {
+                    const color = generateRoleColor(role);
+                    rolesHTML += `<span class="staff-role" style="background-color: ${color}">${role}</span>`;
+                  });
+                }
+
+                staffHTML += `
+                                <div class="staff-member" data-staff-id="${person.id}">
+                                    <div class="staff-name">${person.name}</div>
+                                    <div class="staff-roles">${rolesHTML}</div>
+                                    <div class="staff-actions">
+                                        <button class="staff-btn delete-btn delete-staff" title="删除成员">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+              });
+            }
+
+            positionsHTML += `
+                        <div class="position" data-position-id="${position.id}">
+                            <div class="position-header">
+                                <span class="position-title"><i class="fas fa-briefcase"></i> ${position.name}</span>
+                                <div class="position-actions">
+                                    <button class="action-btn add-staff" title="添加成员">
+                                        <i class="fas fa-user-plus"></i>
+                                    </button>
+                                    <button class="action-btn delete-position" title="删除岗位">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="staff-list">
+                                ${staffHTML}
+                            </div>
+                        </div>
+                    `;
+          });
+
+          moduleEl.innerHTML = `
+                    <div class="module-header">
+                        <span class="module-title"><i class="fas fa-cube"></i> ${module.name}</span>
+                        <div class="module-actions">
+                            <button class="action-btn add-position" title="添加岗位">
+                                <i class="fas fa-briefcase"></i>
+                            </button>
+                            <button class="action-btn delete-module" title="删除模块">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="positions-container">
+                        ${positionsHTML}
+                    </div>
+                `;
+
+          modulesContainer.appendChild(moduleEl);
+        });
+
+        // 重新绑定事件
+        bindModuleEvents();
+      }
+
+      // 设置事件监听器
+      function setupEventListeners() {
+        // 添加模块按钮
+        document
+          .getElementById("add-module-btn")
+          .addEventListener("click", () => {
+            openModal("module-modal");
+          });
+
+        // 关闭模态框按钮
+        document.querySelectorAll(".close-btn").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            closeAllModals();
+          });
+        });
+
+        // 保存模块
+        document
+          .getElementById("save-module")
+          .addEventListener("click", addNewModule);
+
+        // 保存岗位
+        document
+          .getElementById("save-position")
+          .addEventListener("click", addNewPosition);
+
+        // 保存成员
+        document
+          .getElementById("save-staff")
+          .addEventListener("click", saveStaff);
+
+        // 添加角色按钮
+        document
+          .getElementById("add-role-btn")
+          .addEventListener("click", addRole);
+
+        // 详情页添加角色按钮
+        document
+          .getElementById("detail-add-role-btn")
+          .addEventListener("click", addDetailRole);
+
+        // 回车键添加角色
+        document
+          .getElementById("role-input")
+          .addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+              addRole();
+            }
+          });
+
+        // 详情页回车键添加角色
+        document
+          .getElementById("detail-role-input")
+          .addEventListener("keypress", (e) => {
+            if (e.key === "Enter") {
+              addDetailRole();
+            }
+          });
+
+        // 确认弹窗按钮
+        document.getElementById("confirm-ok").addEventListener("click", () => {
+          if (confirmCallback) confirmCallback(true);
+          document.getElementById("confirm-modal").style.display = "none";
+        });
+
+        document
+          .getElementById("confirm-cancel")
+          .addEventListener("click", () => {
+            if (confirmCallback) confirmCallback(false);
+            document.getElementById("confirm-modal").style.display = "none";
+          });
+
+        // 提示弹窗按钮
+        document.getElementById("alert-ok").addEventListener("click", () => {
+          document.getElementById("alert-modal").style.display = "none";
+        });
+
+        // 输入弹窗按钮
+        document.getElementById("input-save").addEventListener("click", () => {
+          const value = document.getElementById("input-value").value.trim();
+          if (value && inputCallback) {
+            inputCallback(value);
+            document.getElementById("input-modal").style.display = "none";
+          }
+        });
+
+        // 保存成员详情
+        document
+          .getElementById("save-details")
+          .addEventListener("click", saveStaffDetails);
+
+        // 关闭成员详情弹窗
+        document
+          .getElementById("close-details")
+          .addEventListener("click", () => {
+            document.getElementById("staff-details-modal").style.display =
+              "none";
+          });
+
+        // 点击模态框外部关闭
+        /*
+        window.addEventListener("click", (e) => {
+          if (e.target.classList.contains("modal")) {
+            closeAllModals();
+          }
+        });
+        */
+      }
+
+      // 添加角色
+      function addRole() {
+        const roleInput = document.getElementById("role-input");
+        const role = roleInput.value.trim();
+
+        if (role && !currentRoles.includes(role)) {
+          currentRoles.push(role);
+          renderRoles();
+          roleInput.value = "";
+        }
+      }
+
+      // 添加详情页角色
+      function addDetailRole() {
+        const roleInput = document.getElementById("detail-role-input");
+        const role = roleInput.value.trim();
+
+        if (role && !detailRoles.includes(role)) {
+          detailRoles.push(role);
+          renderDetailRoles();
+          roleInput.value = "";
+        }
+      }
+
+      // 移除角色
+      function removeRole(role) {
+        currentRoles = currentRoles.filter((r) => r !== role);
+        renderRoles();
+      }
+
+      // 移除详情页角色
+      function removeDetailRole(role) {
+        detailRoles = detailRoles.filter((r) => r !== role);
+        renderDetailRoles();
+      }
+
+      // 渲染角色标签
+      function renderRoles() {
+        const rolesContainer = document.getElementById("roles-container");
+        rolesContainer.innerHTML = "";
+
+        currentRoles.forEach((role) => {
+          const color = generateRoleColor(role);
+          const roleEl = document.createElement("div");
+          roleEl.className = "role-tag";
+          roleEl.innerHTML = `
+            <span>${role}</span>
+            <button class="role-remove" data-role="${role}">
+              <i class="fas fa-times"></i>
+            </button>
+          `;
+          roleEl.style.backgroundColor = color;
+          rolesContainer.appendChild(roleEl);
+        });
+
+        // 绑定移除事件
+        document.querySelectorAll(".role-remove").forEach((btn) => {
+          btn.addEventListener("click", (e) => {
+            const role = e.target.closest(".role-remove").dataset.role;
+            removeRole(role);
+          });
+        });
+      }
+
+      // 渲染详情页角色标签
+      function renderDetailRoles() {
+        const rolesContainer = document.getElementById(
+          "detail-roles-container"
+        );
+        rolesContainer.innerHTML = "";
+
+        detailRoles.forEach((role) => {
+          const color = generateRoleColor(role);
+          const roleEl = document.createElement("div");
+          roleEl.className = "role-tag";
+          roleEl.innerHTML = `
+            <span>${role}</span>
+            <button class="role-remove" data-role="${role}">
+              <i class="fas fa-times"></i>
+            </button>
+          `;
+          roleEl.style.backgroundColor = color;
+          rolesContainer.appendChild(roleEl);
+        });
+
+        // 绑定移除事件
+        document
+          .querySelectorAll("#detail-roles-container .role-remove")
+          .forEach((btn) => {
+            btn.addEventListener("click", (e) => {
+              const role = e.target.closest(".role-remove").dataset.role;
+              removeDetailRole(role);
+            });
+          });
+      }
+
+      // 绑定模块内的事件
+      function bindModuleEvents() {
+        // 模块折叠/展开
+        document.querySelectorAll(".module-title").forEach((el) => {
+          el.addEventListener("click", (e) => {
+            const positionsContainer = e.target
+              .closest(".module")
+              .querySelector(".positions-container");
+            positionsContainer.classList.toggle("collapsed");
+            e.target.classList.toggle("collapsed");
+          });
+        });
+
+        // 岗位折叠/展开
+        document.querySelectorAll(".position-title").forEach((el) => {
+          el.addEventListener("click", (e) => {
+            const staffList = e.target
+              .closest(".position")
+              .querySelector(".staff-list");
+            staffList.classList.toggle("collapsed");
+            e.target.classList.toggle("collapsed");
+          });
+        });
+
+        // 模块重命名
+        document.querySelectorAll(".module-title").forEach((el) => {
+          el.addEventListener("dblclick", (e) => {
+            const moduleId = e.target.closest(".module").dataset.moduleId;
+            const module = modules.find((m) => m.id == moduleId);
+            showInput("修改模块名称", module.name, (newName) => {
+              renameModule(moduleId, newName);
+            });
+          });
+        });
+
+        // 删除模块
+        document.querySelectorAll(".delete-module").forEach((btn) => {
+          btn.addEventListener("click", (e) => {
+            const moduleId = e.target.closest(".module").dataset.moduleId;
+            const module = modules.find((m) => m.id == moduleId);
+            showConfirm(
+              `确定要删除模块 "${module.name}" 吗？此操作将删除该模块下的所有岗位和成员。`,
+              (confirmed) => {
+                if (confirmed) deleteModule(moduleId);
+              }
+            );
+          });
+        });
+
+        // 添加岗位
+        document.querySelectorAll(".add-position").forEach((btn) => {
+          btn.addEventListener("click", (e) => {
+            const moduleId = e.target.closest(".module").dataset.moduleId;
+            currentModuleId = moduleId;
+            openModal("position-modal");
+          });
+        });
+
+        // 岗位重命名
+        document.querySelectorAll(".position-title").forEach((el) => {
+          el.addEventListener("dblclick", (e) => {
+            const positionId = e.target.closest(".position").dataset.positionId;
+            const moduleId = e.target.closest(".module").dataset.moduleId;
+            const module = modules.find((m) => m.id == moduleId);
+            const position = module.positions.find((p) => p.id == positionId);
+            showInput("修改岗位名称", position.name, (newName) => {
+              renamePosition(moduleId, positionId, newName);
+            });
+          });
+        });
+
+        // 删除岗位
+        document.querySelectorAll(".delete-position").forEach((btn) => {
+          btn.addEventListener("click", (e) => {
+            const positionId = e.target.closest(".position").dataset.positionId;
+            const moduleId = e.target.closest(".module").dataset.moduleId;
+            const module = modules.find((m) => m.id == moduleId);
+            const position = module.positions.find((p) => p.id == positionId);
+            showConfirm(
+              `确定要删除岗位 "${position.name}" 吗？此操作将删除该岗位下的所有成员。`,
+              (confirmed) => {
+                if (confirmed) deletePosition(moduleId, positionId);
+              }
+            );
+          });
+        });
+
+        // 添加成员（通过岗位上的按钮）
+        document.querySelectorAll(".add-staff").forEach((btn) => {
+          btn.addEventListener("click", (e) => {
+            const positionId = e.target.closest(".position").dataset.positionId;
+            const moduleId = e.target.closest(".module").dataset.moduleId;
+            currentModuleId = moduleId;
+            currentPositionId = positionId;
+            currentStaffId = null;
+            isEditingStaff = false;
+            currentRoles = [];
+
+            document.getElementById("staff-modal-title").textContent =
+              "添加新成员";
+            document.getElementById("staff-name").value = "";
+            document.getElementById("staff-notes").value = "";
+            renderRoles();
+
+            openModal("staff-modal");
+          });
+        });
+
+        // 点击显示成员详情
+        document.querySelectorAll(".staff-member").forEach((member) => {
+          member.addEventListener("click", (e) => {
+            // 防止点击删除按钮时触发
+            if (e.target.closest(".delete-staff")) return;
+
+            const staffId = e.target.closest(".staff-member").dataset.staffId;
+            const positionId = e.target.closest(".position").dataset.positionId;
+            const moduleId = e.target.closest(".module").dataset.moduleId;
+
+            const module = modules.find((m) => m.id == moduleId);
+            const position = module.positions.find((p) => p.id == positionId);
+            const staff = position.staff.find((s) => s.id == staffId);
+
+            // 保存当前上下文
+            currentModuleId = moduleId;
+            currentPositionId = positionId;
+            currentStaffId = staffId;
+
+            // 显示成员详情
+            showStaffDetails(staff);
+          });
+        });
+
+        // 删除成员
+        document.querySelectorAll(".delete-staff").forEach((btn) => {
+          btn.addEventListener("click", (e) => {
+            const staffId = e.target.closest(".staff-member").dataset.staffId;
+            const positionId = e.target.closest(".position").dataset.positionId;
+            const moduleId = e.target.closest(".module").dataset.moduleId;
+            const module = modules.find((m) => m.id == moduleId);
+            const position = module.positions.find((p) => p.id == positionId);
+            const staff = position.staff.find((s) => s.id == staffId);
+            showConfirm(`确定要删除成员 "${staff.name}" 吗？`, (confirmed) => {
+              if (confirmed) deleteStaff(moduleId, positionId, staffId);
+            });
+          });
+        });
+      }
+
+      // 显示成员详情
+      function showStaffDetails(staff) {
+        document.getElementById("staff-details-title").textContent = staff.name;
+        document.getElementById("detail-name").value = staff.name;
+        document.getElementById("detail-notes").value = staff.notes || "";
+
+        // 设置角色
+        detailRoles = [...(staff.roles || [])];
+        renderDetailRoles();
+
+        document.getElementById("staff-details-modal").style.display = "flex";
+      }
+
+      // 打开模态框
+      function openModal(modalId) {
+        document.getElementById(modalId).style.display = "flex";
+      }
+
+      // 关闭所有模态框
+      function closeAllModals() {
+        document.querySelectorAll(".modal").forEach((modal) => {
+          modal.style.display = "none";
+        });
+
+        // 清空输入框
+        document.getElementById("module-name").value = "";
+        document.getElementById("position-name").value = "";
+        document.getElementById("staff-name").value = "";
+        document.getElementById("role-input").value = "";
+        document.getElementById("staff-notes").value = "";
+        document.getElementById("detail-role-input").value = "";
+
+        currentModuleId = null;
+        currentPositionId = null;
+        currentStaffId = null;
+        isEditingStaff = false;
+        currentRoles = [];
+        detailRoles = [];
+      }
+
+      // 添加新模块
+      function addNewModule() {
+        const name = document.getElementById("module-name").value.trim();
+        if (!name) return;
+
+        const newModule = {
+          id: Date.now(),
+          name: name,
+          positions: [],
+        };
+
+        modules.push(newModule);
+        saveToLocalStorage();
+        renderModules();
+        updateStats();
+        closeAllModals();
+        showAlert(`模块 "${name}" 添加成功！`);
+      }
+
+      // 重命名模块
+      function renameModule(moduleId, newName) {
+        if (!newName) return;
+
+        const module = modules.find((m) => m.id == moduleId);
+        if (!module) return;
+
+        const oldName = module.name;
+        module.name = newName.trim();
+        saveToLocalStorage();
+        renderModules();
+        showAlert(`模块名称已从 "${oldName}" 修改为 "${newName}"`);
+      }
+
+      // 删除模块
+      function deleteModule(moduleId) {
+        const module = modules.find((m) => m.id == moduleId);
+        if (!module) return;
+
+        modules = modules.filter((m) => m.id != moduleId);
+        saveToLocalStorage();
+        renderModules();
+        updateStats();
+        showAlert(`模块 "${module.name}" 已删除`);
+      }
+
+      // 添加新岗位
+      function addNewPosition() {
+        const name = document.getElementById("position-name").value.trim();
+        if (!name || !currentModuleId) return;
+
+        const module = modules.find((m) => m.id == currentModuleId);
+        if (!module) return;
+
+        const newPosition = {
+          id: Date.now(),
+          name: name,
+          staff: [],
+        };
+
+        module.positions.push(newPosition);
+        saveToLocalStorage();
+        renderModules();
+        updateStats();
+        closeAllModals();
+        showAlert(`岗位 "${name}" 添加成功！`);
+      }
+
+      // 重命名岗位
+      function renamePosition(moduleId, positionId, newName) {
+        if (!newName) return;
+
+        const module = modules.find((m) => m.id == moduleId);
+        if (!module) return;
+
+        const position = module.positions.find((p) => p.id == positionId);
+        if (!position) return;
+
+        const oldName = position.name;
+        position.name = newName.trim();
+        saveToLocalStorage();
+        renderModules();
+        showAlert(`岗位名称已从 "${oldName}" 修改为 "${newName}"`);
+      }
+
+      // 删除岗位
+      function deletePosition(moduleId, positionId) {
+        const module = modules.find((m) => m.id == moduleId);
+        if (!module) return;
+
+        const position = module.positions.find((p) => p.id == positionId);
+        if (!position) return;
+
+        module.positions = module.positions.filter((p) => p.id != positionId);
+        saveToLocalStorage();
+        renderModules();
+        updateStats();
+        showAlert(`岗位 "${position.name}" 已删除`);
+      }
+
+      // 保存成员（添加或编辑）
+      function saveStaff() {
+        const name = document.getElementById("staff-name").value.trim();
+        const notes = document.getElementById("staff-notes").value.trim();
+
+        if (!name || !currentModuleId || !currentPositionId) return;
+
+        const module = modules.find((m) => m.id == currentModuleId);
+        if (!module) return;
+
+        const position = module.positions.find(
+          (p) => p.id == currentPositionId
+        );
+        if (!position) return;
+
+        if (isEditingStaff && currentStaffId) {
+          // 编辑现有成员
+          const staff = position.staff.find((s) => s.id == currentStaffId);
+          if (!staff) return;
+
+          const oldName = staff.name;
+          staff.name = name;
+          staff.roles = [...currentRoles];
+          staff.notes = notes;
+
+          saveToLocalStorage();
+          renderModules();
+          closeAllModals();
+          showAlert(`成员 "${oldName}" 的信息已更新`);
+        } else {
+          // 添加新成员
+          const newStaff = {
+            id: Date.now(),
+            name: name,
+            roles: [...currentRoles],
+            notes: notes,
+          };
+
+          position.staff.push(newStaff);
+          saveToLocalStorage();
+          renderModules();
+          updateStats();
+          closeAllModals();
+          showAlert(`成员 "${name}" 添加成功！`);
+        }
+      }
+
+      // 保存成员详情
+      function saveStaffDetails() {
+        const name = document.getElementById("detail-name").value.trim();
+        const notes = document.getElementById("detail-notes").value.trim();
+
+        if (!name || !currentModuleId || !currentPositionId || !currentStaffId)
+          return;
+
+        const module = modules.find((m) => m.id == currentModuleId);
+        if (!module) return;
+
+        const position = module.positions.find(
+          (p) => p.id == currentPositionId
+        );
+        if (!position) return;
+
+        const staff = position.staff.find((s) => s.id == currentStaffId);
+        if (!staff) return;
+
+        const oldName = staff.name;
+        staff.name = name;
+        staff.roles = [...detailRoles];
+        staff.notes = notes;
+
+        saveToLocalStorage();
+        renderModules();
+        closeAllModals();
+        showAlert(`成员 "${oldName}" 的信息已更新`);
+      }
+
+      // 删除成员
+      function deleteStaff(moduleId, positionId, staffId) {
+        const module = modules.find((m) => m.id == moduleId);
+        if (!module) return;
+
+        const position = module.positions.find((p) => p.id == positionId);
+        if (!position) return;
+
+        const staff = position.staff.find((s) => s.id == staffId);
+        if (!staff) return;
+
+        position.staff = position.staff.filter((s) => s.id != staffId);
+        saveToLocalStorage();
+        renderModules();
+        updateStats();
+        showAlert(`成员 "${staff.name}" 已删除`);
+      }
+
+      // 保存到本地存储
+      function saveToLocalStorage() {
+        localStorage.setItem("teamModules", JSON.stringify(modules));
+      }
+
+      // 初始化应用
+      document.addEventListener("DOMContentLoaded", initApp);
+    </script>
+  </body>
+</html>
