@@ -1901,11 +1901,11 @@ function saveAutoHideSettings() {
   saveToLocalStorage();
 }
 
-// 事件监听
-addMainTitleBtn.addEventListener("click", () => openAddModal("main-title"));
-addSubtitleBtn.addEventListener("click", () => openAddModal("subtitle"));
-addContentBtn.addEventListener("click", () => openAddModal("content-card"));
-themeToggleBtn.addEventListener("click", toggleTheme);
+// // 事件监听
+// addMainTitleBtn.addEventListener("click", () => openAddModal("main-title"));
+// addSubtitleBtn.addEventListener("click", () => openAddModal("subtitle"));
+// addContentBtn.addEventListener("click", () => openAddModal("content-card"));
+// themeToggleBtn.addEventListener("click", toggleTheme);
 
 closeModal.addEventListener("click", () => {
   modalOverlay.classList.remove("active");
@@ -2023,19 +2023,82 @@ document.addEventListener("click", resetAutoHideTimer);
 window.addEventListener("resize", () => {});
 window.addEventListener("beforeunload", saveToLocalStorage);
 
+// ==================== 新增：事件监听器初始化 ====================
+function initEventListeners() {
+  console.log("🔧 初始化事件监听器...");
+  
+  // 重新获取按钮元素（确保DOM已加载）
+  const buttons = {
+    addMainTitleBtn: document.getElementById("addMainTitleBtn"),
+    addSubtitleBtn: document.getElementById("addSubtitleBtn"),
+    addContentBtn: document.getElementById("addContentBtn"),
+    themeToggleBtn: document.getElementById("themeToggleBtn")
+  };
+  
+  // 检查按钮是否存在
+  console.log("📊 按钮状态检查:");
+  for (const [name, btn] of Object.entries(buttons)) {
+    console.log(`  ${name}:`, btn ? "✅ 找到" : "❌ 未找到");
+  }
+  
+  // 绑定大标题按钮
+  if (buttons.addMainTitleBtn) {
+    buttons.addMainTitleBtn.addEventListener("click", function() {
+      console.log("🖱️ 点击：大标题按钮");
+      openAddModal("main-title");
+    });
+  }
+  
+  // 绑定小标题按钮
+  if (buttons.addSubtitleBtn) {
+    buttons.addSubtitleBtn.addEventListener("click", function() {
+      console.log("🖱️ 点击：小标题按钮");
+      openAddModal("subtitle");
+    });
+  }
+  
+  // 绑定新增内容按钮
+  if (buttons.addContentBtn) {
+    buttons.addContentBtn.addEventListener("click", function() {
+      console.log("🖱️ 点击：新增内容按钮");
+      openAddModal("content-card");
+    });
+  }
+  
+  // 绑定主题切换按钮
+  if (buttons.themeToggleBtn) {
+    buttons.themeToggleBtn.addEventListener("click", function() {
+      console.log("🖱️ 点击：主题切换按钮");
+      toggleTheme();
+    });
+  }
+  
+  console.log("✅ 事件监听器初始化完成");
+}
+
 // 主初始化函数
 function initializeApp() {
+  console.log("🚀 开始初始化应用...");
+  
+  // 先初始化页面
+  initPage();
+  
+  // 初始化各种功能
   initBackgroundSelector();
   initOpacityControl();
   initImportExport();
-  initPage();
   initAutoHideSettings();
   initImageFunctions();
-
-  // 初始化TXT导入功能（如果存在）
+  
+  // 🔴 重要：新增这行代码
+  initEventListeners();
+  
+  // 初始化TXT导入功能
   if (typeof initTxtImportFunctions === "function") {
     initTxtImportFunctions();
   }
+  
+  console.log("🎉 应用初始化完成");
 }
 
 // 页面加载完成后初始化
@@ -2061,3 +2124,4 @@ if (document.readyState === "loading") {
   console.log("文档已经加载完成，立即初始化...");
   initializeApp();
 }
+
