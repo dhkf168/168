@@ -1,0 +1,412 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>巴西电子</title>
+    <link
+      rel="icon"
+      href="https://raw.githubusercontent.com/mubai16888/mb/main/mb.ico"
+      type="image/x-icon"
+    />
+    <link
+      rel="icon"
+      href="https://raw.githubusercontent.com/mubai16888/mb/main/mb.png"
+      type="image/png"
+      sizes="192x192"
+    />
+
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/perfect-scrollbar@1.5.0/css/perfect-scrollbar.css"
+    />
+    <script src="https://unpkg.com/perfect-scrollbar@1.5.0/dist/perfect-scrollbar.min.js"></script>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        height: 100%;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        overflow: hidden;
+        background-color: #f0f2f5;
+      }
+
+      .tabs {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .tab-buttons {
+        display: flex;
+        align-items: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 36px;
+        background-color: #ffffff;
+        z-index: 10;
+        border-bottom: 1px solid #ddd;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      }
+      .tab-buttons button {
+        padding: 6px 12px;
+        border: none;
+        background: none;
+        cursor: pointer;
+        font-size: 14px;
+        color: #333;
+        border-radius: 6px 6px 0 0;
+        margin-right: 4px;
+        transition: all 0.4s ease;
+      }
+      .tab-buttons button:hover {
+        background-color: #ebebeb;
+        transform: translateY(-2px);
+      }
+      .tab-buttons button.active {
+        background: linear-gradient(135deg, #4e8efb, #a777e3);
+        color: #fff;
+        box-shadow: 0 -2px 0 #4e8efb inset;
+      }
+
+      /* 刷新按钮炫酷样式 */
+      .refresh-btn {
+        position: relative;
+        margin-left: auto;
+        margin-right: 10px;
+        width: 34px;
+        height: 34px;
+        border-radius: 50%;
+        border: none;
+        cursor: pointer;
+        background: linear-gradient(135deg, #4e8efb, #a777e3);
+        background-size: 200% 200%;
+        color: #fff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 4px 10px rgba(78, 142, 251, 0.4);
+        transition: all 0.3s ease;
+        overflow: hidden;
+      }
+      .refresh-btn:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 14px rgba(167, 119, 227, 0.6);
+        background-position: right center;
+        background: linear-gradient(135deg, #5d7de8, #8f5fe1);
+      }
+      .refresh-icon {
+        width: 20px;
+        height: 20px;
+        pointer-events: none;
+        transition: transform 0.6s ease;
+      }
+      .refresh-btn:hover .refresh-icon {
+        transform: rotate(180deg);
+      }
+      .refresh-btn:active .refresh-icon {
+        transform: rotate(360deg);
+        transition: transform 0.3s ease;
+      }
+      .refresh-btn.loading .refresh-icon {
+        animation: rotate360 1s linear infinite;
+      }
+      @keyframes rotate360 {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      .refresh-btn:active {
+        animation: bounceRotate 0.6s ease forwards;
+      }
+      @keyframes bounceRotate {
+        0% {
+          transform: scale(1) rotate(0deg);
+        }
+        30% {
+          transform: scale(1.2) rotate(90deg);
+        }
+        60% {
+          transform: scale(0.95) rotate(270deg);
+        }
+        100% {
+          transform: scale(1) rotate(360deg);
+        }
+      }
+      .refresh-btn:after {
+        content: "";
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        top: 0;
+        left: 0;
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(0);
+        opacity: 0;
+        transition:
+          transform 0.5s,
+          opacity 0.5s;
+        pointer-events: none;
+      }
+      .refresh-btn:active:after {
+        transform: scale(2.5);
+        opacity: 1;
+      }
+      .refresh-btn::before {
+        content: "";
+        position: absolute;
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: #fff;
+        top: 5%;
+        left: 5%;
+        opacity: 0;
+        pointer-events: none;
+        animation: twinkle 1.5s infinite;
+      }
+      @keyframes twinkle {
+        0%,
+        100% {
+          opacity: 0;
+          transform: scale(0.5);
+        }
+        50% {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      /* 刷新完成闪光效果 */
+      @keyframes flashGlow {
+        0% {
+          box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+        }
+        50% {
+          box-shadow:
+            0 0 12px rgba(255, 255, 255, 0.8),
+            0 0 20px rgba(78, 142, 251, 0.6);
+        }
+        100% {
+          box-shadow: 0 0 0 rgba(255, 255, 255, 0);
+        }
+      }
+      .refresh-btn.flash {
+        animation: flashGlow 0.8s ease;
+      }
+
+      .content {
+        width: 100%;
+        position: absolute;
+        top: 36px;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 8px;
+      }
+      .section {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        visibility: hidden;
+        z-index: 0;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        opacity: 0;
+        transition:
+          opacity 0.4s ease,
+          box-shadow 0.3s ease;
+      }
+      .section.active-section {
+        visibility: visible;
+        z-index: 1;
+        opacity: 1;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      }
+      iframe {
+        width: 100%;
+        height: 100%;
+        border: none;
+      }
+
+      .toast {
+        position: fixed;
+        top: 50px;
+        right: 20px;
+        background: rgba(76, 175, 80, 0.9);
+        color: white;
+        padding: 12px 22px;
+        border-radius: 8px;
+        font-size: 14px;
+        opacity: 0;
+        transform: translateY(-10px) scale(0.95);
+        transition: all 0.4s ease;
+        z-index: 100;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      }
+      .toast.show {
+        opacity: 1;
+        transform: translateY(0) scale(1.05);
+      }
+
+      ::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: linear-gradient(135deg, #6e8efb, #a777e3);
+        border-radius: 10px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: linear-gradient(135deg, #5d7de8, #8f5fe1);
+      }
+      iframe::-webkit-scrollbar {
+        width: 6px;
+        height: 6px;
+      }
+      iframe::-webkit-scrollbar-track {
+        background: rgba(241, 241, 241, 0.5);
+      }
+      iframe::-webkit-scrollbar-thumb {
+        background: linear-gradient(
+          135deg,
+          rgba(110, 142, 251, 0.8),
+          rgba(167, 119, 227, 0.8)
+        );
+      }
+    </style>
+  </head>
+  <body>
+    <div class="toast" id="toast">✅ 内容切换成功</div>
+    <div class="tabs">
+      <div class="tab-buttons" id="tabButtons">
+        <button class="refresh-btn" id="refreshBtn" title="刷新当前页面">
+          <svg viewBox="0 0 24 24" class="refresh-icon">
+            <path
+              d="M17.65 6.35A8 8 0 1 0 19 12h-2a6 6 0 1 1-1.76-4.24l-2.12 2.12H21V3l-3.35 3.35z"
+              fill="currentColor"
+            />
+          </svg>
+        </button>
+      </div>
+      <div class="content" id="contentContainer"></div>
+    </div>
+
+    <script>
+      const pages = [
+        { id: "section1", src: "./main.html", titleFallback: "读取TXT" },
+        {
+          id: "section2",
+          src: "./readerText.html",
+          titleFallback: "读取TXT文件",
+        },
+        { id: "section3", src: "./Risk.html", titleFallback: "风控教程" },
+        { id: "section4", src: "./staff.html", titleFallback: "人员表" },
+        { id: "section5", src: "./exchange.html", titleFallback: "汇率表" },
+        { id: "section6", src: "./messages.html", titleFallback: "站内信" },
+        {
+          id: "section7",
+          src: "./planning.html",
+          titleFallback: "每日规划",
+        },
+      ];
+      const toast = document.getElementById("toast");
+      const contentContainer = document.getElementById("contentContainer");
+      const tabButtonsContainer = document.getElementById("tabButtons");
+      const refreshBtn = document.getElementById("refreshBtn");
+      let currentIndex = 0;
+
+      pages.forEach((page, index) => {
+        const section = document.createElement("div");
+        section.id = page.id;
+        section.className = "section";
+        const iframe = document.createElement("iframe");
+        iframe.src = page.src;
+        iframe.id = "iframe" + index;
+        iframe.onload = () => {
+          try {
+            if (iframe.contentDocument && iframe.contentDocument.body)
+              new PerfectScrollbar(iframe.contentDocument.body, {
+                suppressScrollX: true,
+              });
+          } catch (e) {
+            console.warn("无法访问 iframe 内容（可能是跨域）：", page.src);
+          }
+        };
+        section.appendChild(iframe);
+        contentContainer.appendChild(section);
+        const btn = document.createElement("button");
+        btn.textContent = page.titleFallback;
+        btn.addEventListener("click", () => switchToTab(index));
+        tabButtonsContainer.insertBefore(btn, refreshBtn);
+      });
+
+      function switchToTab(index) {
+        if (index === currentIndex) return;
+        document
+          .getElementById(pages[currentIndex].id)
+          .classList.remove("active-section");
+        tabButtonsContainer.children[currentIndex].classList.remove("active");
+        currentIndex = index;
+        document
+          .getElementById(pages[currentIndex].id)
+          .classList.add("active-section");
+        tabButtonsContainer.children[currentIndex].classList.add("active");
+        showToast("切换至：" + pages[currentIndex].titleFallback);
+        updateTitle();
+      }
+
+      function updateTitle() {
+        const iframe = document.getElementById("iframe" + currentIndex);
+        try {
+          document.title =
+            iframe?.contentDocument?.title || pages[currentIndex].titleFallback;
+        } catch (e) {
+          document.title = pages[currentIndex].titleFallback;
+        }
+      }
+
+      function showToast(msg) {
+        toast.textContent = msg;
+        toast.classList.add("show");
+        setTimeout(() => toast.classList.remove("show"), 1500);
+      }
+
+      refreshBtn.addEventListener("click", () => {
+        const iframe = document.getElementById("iframe" + currentIndex);
+        if (iframe) {
+          refreshBtn.classList.add("loading");
+          iframe.src = iframe.src;
+          setTimeout(() => {
+            refreshBtn.classList.remove("loading");
+            refreshBtn.classList.add("flash"); // 刷新完成闪光
+            setTimeout(() => refreshBtn.classList.remove("flash"), 800);
+            showToast("🔄 已刷新：" + pages[currentIndex].titleFallback);
+          }, 1000);
+        }
+      });
+
+      document.getElementById(pages[0].id).classList.add("active-section");
+      tabButtonsContainer.children[0].classList.add("active");
+    </script>
+  </body>
+</html>
