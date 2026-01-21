@@ -370,20 +370,28 @@
         tabButtonsContainer.insertBefore(btn, refreshBtn);
       });
 
-      function switchToTab(index) {
-        if (index === currentIndex) return;
-        document
-          .getElementById(pages[currentIndex].id)
-          .classList.remove("active-section");
-        tabButtonsContainer.children[currentIndex].classList.remove("active");
-        currentIndex = index;
-        document
-          .getElementById(pages[currentIndex].id)
-          .classList.add("active-section");
-        tabButtonsContainer.children[currentIndex].classList.add("active");
-        showToast("切换至：" + pages[currentIndex].titleFallback);
-        updateTitle();
-      }
+// 在 switchToTab 函数中，确保当前激活的层级最高
+function switchToTab(index) {
+  if (index === currentIndex) return;
+  
+  // 隐藏旧的
+  const prevSection = document.getElementById(pages[currentIndex].id);
+  prevSection.classList.remove("active-section");
+  prevSection.style.zIndex = "0"; // 显式降低层级
+
+  tabButtonsContainer.children[currentIndex].classList.remove("active");
+  
+  currentIndex = index;
+  
+  // 显示新的
+  const activeSection = document.getElementById(pages[currentIndex].id);
+  activeSection.classList.add("active-section");
+  activeSection.style.zIndex = "10"; // 显式提高层级
+
+  tabButtonsContainer.children[currentIndex].classList.add("active");
+  showToast("切换至：" + pages[currentIndex].titleFallback);
+  updateTitle();
+}
 
       function updateTitle() {
         const iframe = document.getElementById("iframe" + currentIndex);
@@ -420,6 +428,7 @@
     </script>
   </body>
 </html>
+
 
 
 
