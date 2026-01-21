@@ -56,6 +56,7 @@
         border-bottom: 1px solid #ddd;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
          pointer-events: auto;
+        overflow: hidden;
       }
       .tab-buttons button {
         padding: 6px 12px;
@@ -372,23 +373,39 @@
 
 // 在 switchToTab 函数中，确保当前激活的层级最高
 function switchToTab(index) {
+  // 如果点击的是当前已激活的标签，直接跳过
   if (index === currentIndex) return;
-  
-  // 隐藏旧的
+
+  // --- 1. 处理【旧页面】 (隐藏并彻底禁用) ---
   const prevSection = document.getElementById(pages[currentIndex].id);
-  prevSection.classList.remove("active-section");
-  prevSection.style.zIndex = "0"; // 显式降低层级
-
-  tabButtonsContainer.children[currentIndex].classList.remove("active");
+  if (prevSection) {
+    prevSection.classList.remove("active-section");
+    prevSection.style.zIndex = "0";           // 降低层级
+    prevSection.style.pointerEvents = "none"; // 核心：彻底禁止点击，防止它挡住新页面
+  }
   
+  // 移除旧按钮的高亮样式
+  if (tabButtonsContainer.children[currentIndex]) {
+    tabButtonsContainer.children[currentIndex].classList.remove("active");
+  }
+
+  // --- 2. 更新索引 ---
   currentIndex = index;
-  
-  // 显示新的
-  const activeSection = document.getElementById(pages[currentIndex].id);
-  activeSection.classList.add("active-section");
-  activeSection.style.zIndex = "10"; // 显式提高层级
 
-  tabButtonsContainer.children[currentIndex].classList.add("active");
+  // --- 3. 处理【新页面】 (显示并开启交互) ---
+  const activeSection = document.getElementById(pages[currentIndex].id);
+  if (activeSection) {
+    activeSection.classList.add("active-section");
+    activeSection.style.zIndex = "10";         // 提高层级
+    activeSection.style.pointerEvents = "auto"; // 核心：确保开启点击交互
+  }
+
+  // 给新按钮加上高亮样式
+  if (tabButtonsContainer.children[currentIndex]) {
+    tabButtonsContainer.children[currentIndex].classList.add("active");
+  }
+
+  // --- 4. 辅助功能 ---
   showToast("切换至：" + pages[currentIndex].titleFallback);
   updateTitle();
 }
@@ -428,6 +445,7 @@ function switchToTab(index) {
     </script>
   </body>
 </html>
+
 
 
 
