@@ -55,6 +55,7 @@
         z-index: 1000 !important;
         border-bottom: 1px solid #ddd;
         box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+         pointer-events: auto;
       }
       .tab-buttons button {
         padding: 6px 12px;
@@ -207,6 +208,10 @@
         animation: flashGlow 0.8s ease;
       }
 
+      .section.active-section iframe {
+  pointer-events: auto; /* iframe内部可以交互 */
+}
+
       .content {
         width: 100%;
         position: absolute;
@@ -216,7 +221,7 @@
         right: 0;
         padding: 8px;
         z-index: 1;
-        
+        pointer-events: none;
       }
       .section {
         width: 100%;
@@ -233,6 +238,7 @@
         transition:
           opacity 0.4s ease,
           box-shadow 0.3s ease;
+        pointer-events: none;
       }
       .section.active-section {
         visibility: visible;
@@ -414,6 +420,7 @@
     </script>
   </body>
 </html>
+
 
 
 
