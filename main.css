@@ -610,6 +610,7 @@ body.light-mode .content-area {
   cursor: pointer;
   transition: all var(--transition-fast);
   box-shadow: 0 4px 12px rgba(255, 0, 204, 0.1);
+  scroll-margin-top: 50px;
 }
 
 body.light-mode .main-title {
