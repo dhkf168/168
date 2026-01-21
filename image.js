@@ -733,12 +733,21 @@ function resetCopyButton(btn, originalText, originalClass) {
 }
 
 // 删除当前图片
-function deleteCurrentImage() {
-  if (!confirm("确定要删除这张图片吗？")) return;
+// 修改后的删除函数，支持自定义弹窗
+async function deleteCurrentImage() {
+  // 使用我们之前定义的 Modal.confirm 替代系统 confirm
+  // 注意：必须加 await，否则代码会直接跳过确认向下执行
+  const isConfirmed = await Modal.confirm(
+    "确定要删除这张图片吗？此操作不可撤销。",
+    "确认删除",
+  );
+
+  if (!isConfirmed) return;
 
   const cardIndex = contentItems.findIndex(
     (item) => item.id === currentViewingCardId,
   );
+
   if (cardIndex !== -1 && contentItems[cardIndex].images) {
     // 从数组中删除图片
     contentItems[cardIndex].images.splice(currentViewingImageIndex, 1);
@@ -770,11 +779,12 @@ function deleteCurrentImage() {
     // 显示删除成功通知
     setTimeout(() => {
       showCopyNotification();
-      copyNotification.querySelector("span").textContent = "图片已删除！";
+      // 确保 copyNotification 元素存在
+      const notifySpan = document.querySelector("#copyNotification span");
+      if (notifySpan) notifySpan.textContent = "图片已删除！";
     }, 300);
   }
 }
-
 // ============ 需要在现有 index.js 中修改/添加的函数 ============
 
 // ===== 需要修改 saveToLocalStorage() 函数 =====
