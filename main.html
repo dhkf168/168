@@ -20,10 +20,11 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     />
     <link rel="stylesheet" href="./image.css" />
-    <link rel="stylesheet" href="./main.css" />
+    <link rel="stylesheet" href="./index.css" />
     <!-- <link rel="stylesheet" href="./bgtr.css" /> -->
   </head>
   <body>
+    <div id="mouse-ripple-container"></div>
     <!-- 背景媒体容器 -->
     <div id="background-container">
       <!-- <div id="background-overlay"></div> -->
@@ -54,7 +55,7 @@
           <!-- 在现有导航栏中，找到添加内容按钮的部分，添加图片按钮 -->
           <button class="position-btn add-images" id="addImagesBtn">
             <i class="fas fa-images"></i>
-            <span>图片</span>
+            <span>+图片</span>
           </button>
         </div>
 
@@ -251,7 +252,7 @@
     <div class="background-modal" id="backgroundModal">
       <div class="background-modal-content">
         <div class="background-modal-header">
-          <h2 class="background-modal-title">选择背景</h2>
+          <h2 class="background-modal-title" data-text="选择背景">选择背景</h2>
           <button class="close-modal" id="closeBackgroundModal">&times;</button>
         </div>
 
@@ -409,7 +410,13 @@
     <div class="import-export-modal" id="importExportModal">
       <div class="import-export-modal-content">
         <div class="import-export-modal-header">
-          <h2 class="import-export-modal-title">导入/导出数据</h2>
+          <h2
+            class="import-export-modal-title"
+            data-text="导入/导出数据
+"
+          >
+            导入/导出数据
+          </h2>
           <button class="close-modal" id="closeImportExportModal">
             &times;
           </button>
@@ -520,10 +527,9 @@
         删除内容
       </div>
     </div>
-<script src="./render.js"></script>
+
     <script src="./image.js"></script>
-    <script src="./main.js"></script>
-    
+    <script src="./index.js"></script>
+    <script src="./render.js"></script>
   </body>
 </html>
-
