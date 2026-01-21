@@ -1,9 +1,20 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>巴西电子</title>
+    <link
+      rel="icon"
+      href="https://raw.githubusercontent.com/mubai16888/mb/main/mb.ico"
+      type="image/x-icon"
+    />
+    <link
+      rel="icon"
+      href="https://raw.githubusercontent.com/mubai16888/mb/main/mb.png"
+      type="image/png"
+      sizes="192x192"
+    />
 
     <link
       rel="stylesheet"
@@ -144,7 +155,9 @@
         background: rgba(255, 255, 255, 0.3);
         transform: scale(0);
         opacity: 0;
-        transition: transform 0.5s, opacity 0.5s;
+        transition:
+          transform 0.5s,
+          opacity 0.5s;
         pointer-events: none;
       }
       .refresh-btn:active:after {
@@ -182,7 +195,8 @@
           box-shadow: 0 0 0 rgba(255, 255, 255, 0);
         }
         50% {
-          box-shadow: 0 0 12px rgba(255, 255, 255, 0.8),
+          box-shadow:
+            0 0 12px rgba(255, 255, 255, 0.8),
             0 0 20px rgba(78, 142, 251, 0.6);
         }
         100% {
@@ -214,7 +228,9 @@
         overflow: hidden;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         opacity: 0;
-        transition: opacity 0.4s ease, box-shadow 0.3s ease;
+        transition:
+          opacity 0.4s ease,
+          box-shadow 0.3s ease;
       }
       .section.active-section {
         visibility: visible;
@@ -297,23 +313,20 @@
 
     <script>
       const pages = [
+        { id: "section1", src: "./main.html", titleFallback: "读取TXT" },
         {
           id: "section2",
-          src: "./风控读取TXT导航版.html",
-          titleFallback: "稽核风控",
+          src: "./readerText.html",
+          titleFallback: "读取TXT文件",
         },
-        { id: "section3", src: "./运维分析.html", titleFallback: "数据分析" },
-        { id: "section5", src: "./人员表.html", titleFallback: "人员表" },
-        { id: "section6", src: "./汇率表.html", titleFallback: "三方汇率" },
+        { id: "section3", src: "./Risk.html", titleFallback: "风控教程" },
+        { id: "section4", src: "./staff.html", titleFallback: "人员表" },
+        { id: "section5", src: "./exchange.html", titleFallback: "汇率表" },
+        { id: "section6", src: "./messages.html", titleFallback: "站内信" },
         {
           id: "section7",
-          src: "./站内信(合并版).html",
-          titleFallback: "站内信",
-        },
-        {
-          id: "section8",
-          src: "./每日行程规划.html",
-          titleFallback: "待办事项",
+          src: "./planning.html",
+          titleFallback: "每日规划",
         },
       ];
       const toast = document.getElementById("toast");
