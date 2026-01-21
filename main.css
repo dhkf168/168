@@ -1,2292 +1,2275 @@
-/* index.css - 重构后的完整代码 */
-/* ==================== CSS变量 ==================== */
-:root {
-  /* 尺寸变量 */
-  --nav-height: 50px;
-  --radius-sm: 4px;
-  --radius-md: 6px;
-  --radius-lg: 8px;
-  --radius-xl: 10px;
-  --radius-2xl: 12px;
-
-  --sidebar-width: 100px;
-  --content-max-width: calc(1400px - 150px); /* 1400px - 180px */
-  --container-min-width: 500px;
-  --container-max-width: 1400px;
-
-  /* 过渡效果 */
-  --transition-fast: 0.3s ease;
-  --transition-medium: 0.4s ease;
-  --transition-slow: 0.5s ease;
-
-  /* 阴影 */
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
-  --shadow-md: 0 4px 15px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 5px 20px rgba(0, 0, 0, 0.3);
-  --shadow-xl: 0 8px 25px rgba(0, 0, 0, 0.4);
-  --shadow-2xl: 0 10px 30px rgba(0, 0, 0, 0.5);
-  --shadow-3xl: 0 20px 50px rgba(0, 0, 0, 0.7);
-
-  /* 暗色主题渐变 */
-  --gradient-primary: linear-gradient(90deg, #ff00cc, #3333ff);
-  --gradient-secondary: linear-gradient(90deg, #00cc66, #00ff88);
-  --gradient-tertiary: linear-gradient(90deg, #3366ff, #6699ff);
-  --gradient-warning: linear-gradient(90deg, #ff9900, #ffcc00);
-  --gradient-info: linear-gradient(90deg, #009688, #4db6ac);
-  --gradient-danger: linear-gradient(90deg, #ff3366, #ff6699);
-  --gradient-purple: linear-gradient(90deg, #9933ff, #cc66ff);
-  --gradient-gray: linear-gradient(90deg, #424242, #616161);
-  --gradient-dark-bg: linear-gradient(90deg, #1a1a3a, #2a2a5a);
-  --gradient-dark-bg-alt: linear-gradient(145deg, #1a1a3a, #0f0f2a);
-  --gradient-title-sub: linear-gradient(to right, #a8ff78, #78ffd6);
-
-  /* 浅色主题渐变 */
-  --gradient-primary-light: linear-gradient(90deg, #ff4081, #2979ff);
-  --gradient-secondary-light: linear-gradient(90deg, #00c853, #64dd17);
-  --gradient-tertiary-light: linear-gradient(90deg, #2979ff, #448aff);
-  --gradient-warning-light: linear-gradient(90deg, #ff9800, #ffb74d);
-  --gradient-info-light: linear-gradient(90deg, #009688, #4db6ac);
-  --gradient-danger-light: linear-gradient(90deg, #ff5252, #ff8a80);
-  --gradient-purple-light: linear-gradient(90deg, #7c4dff, #b388ff);
-  --gradient-gray-light: linear-gradient(90deg, #bdbdbd, #e0e0e0);
-  --gradient-light-bg: linear-gradient(90deg, #e8eaf6, #c5cae9);
-
-  /* 背景渐变 */
-  --gradient-body-dark: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-  --gradient-body-light: linear-gradient(135deg, #e3f2fd, #bbdefb, #90caf9);
-
-  /* 边框渐变 */
-  --border-gradient-dark: linear-gradient(90deg, #ff00cc, #3333ff);
-  --border-gradient-light: linear-gradient(90deg, #ff4081, #2979ff);
-
-  /* 背景色 */
-  --bg-dark-transparent: rgba(20, 20, 40, 0.103);
-  --bg-light-transparent: rgba(255, 255, 255, 0.137);
-  --bg-dark-solid: rgba(20, 20, 40, 0.95);
-  --bg-light-solid: rgba(255, 255, 255, 1);
-  --bg-overlay-dark: rgba(15, 15, 30, 0);
-  --bg-overlay-light: rgba(255, 255, 255, 0);
-
-  /* 文字颜色 */
-  --text-dark: #ffffff;
-  --text-light: #333;
-  --text-secondary-dark: #aaa;
-  --text-secondary-light: #666;
-  --text-muted-dark: #777;
-  --text-muted-light: #666;
-
-  /* 边框颜色 */
-  --border-dark: rgba(255, 255, 255, 0.1);
-  --border-light: rgba(0, 0, 0, 0.1);
-  --border-secondary-dark: rgba(255, 255, 255, 0.08);
-  --border-secondary-light: rgba(0, 0, 0, 0.08);
-
-  /* 高亮色 */
-  --highlight-primary: #00ccff;
-  --highlight-primary-light: #0097a7;
-  --highlight-accent: #ff00cc;
-  --highlight-accent-light: #f50057;
-  --highlight-warning: #ffcc00;
-  --highlight-warning-light: #ff9800;
-
-  /* 悬停渐变 */
-  --hover-gradient: linear-gradient(to right, #ff416c, #ff4b2b, #ffb347);
-}
-
-/* 启用窗口滚动 */
-html,
-body {
-  height: 100%;
-  overflow-y: auto; /* 窗口级别滚动 */
-  overflow-x: hidden;
-}
-
-/* ==================== 基础重置 ==================== */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: "Segoe UI", "Microsoft YaHei", sans-serif;
-}
-/* ==================== 基础样式 ==================== */
-body {
-  background: var(--gradient-body-dark);
-  color: var(--text-dark);
-  min-height: 100vh;
-  position: relative;
-  transition: background var(--transition-slow);
-  min-width: var(--container-min-width);
-  overflow-x: auto; /* 在小宽度时允许水平滚动 */
-}
-
-body.light-mode {
-  background: var(--gradient-body-light);
-  color: var(--text-light);
-  background: transparent !important;
-}
-
-/* ==================== 背景相关 ==================== */
-#background-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: -2;
-  overflow: hidden;
-}
-
-#background-media,
-#background-video {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  opacity: 0;
-  transition: opacity var(--transition-slow);
-}
-
-#background-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: var(--bg-overlay-dark);
-  z-index: -1;
-  transition: background var(--transition-slow);
-}
-
-body.light-mode #background-overlay {
-  background: var(--bg-overlay-light);
-}
-
-/* ==================== 布局容器 ==================== */
-.container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  width: 100%;
-  position: relative;
-  overflow-x: visible;
-}
-
-.main-content {
-  display: flex;
-  flex: 1;
-  padding-top: var(--nav-height);
-  width: 100%;
-  position: relative;
-  overflow-x: visible;
-}
-
-/* ==================== 通用按钮基础样式 ==================== */
-.position-btn,
-.control-btn {
-  border: none;
-  border-radius: var(--radius-md);
-  padding: 6px 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
-  min-width: 70px;
-  justify-content: center;
-  height: 36px;
-  box-shadow: var(--shadow-sm);
-}
-
-.position-btn i,
-.control-btn i {
-  font-size: 0.9rem;
-}
-
-.position-btn:hover,
-.control-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
-
-/* ==================== 顶部导航栏 ==================== */
-.top-navigation {
-  width: 100%;
-  background: var(--bg-dark-solid);
-  padding: 5px 10px;
-  box-shadow: var(--shadow-md);
-  border-bottom: 1px solid var(--border-dark);
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 100;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: var(--nav-height);
-  transition: all var(--transition-fast);
-}
-
-body.light-mode .top-navigation {
-  background: var(--bg-light-solid) !important;
-  border-bottom: 1px solid var(--border-light);
-  backdrop-filter: none !important;
-}
-
-.top-navigation::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 1px;
-  background: var(--border-gradient-dark);
-  opacity: 0.6;
-  transition: background var(--transition-slow);
-}
-
-body.light-mode .top-navigation::after {
-  background: var(--border-gradient-light);
-  opacity: 0.4;
-}
-
-/* 导航栏按钮组 */
-.nav-left-buttons,
-.nav-right-buttons {
-  display: flex;
-  gap: 8px;
-  flex: 1;
-}
-
-.nav-right-buttons {
-  justify-content: flex-end;
-  padding-right: 5px;
-}
-
-/* 定位按钮 */
-.position-btn {
-  background: var(--gradient-dark-bg);
-  color: white;
-  border: 1px solid var(--border-dark);
-}
-
-body.light-mode .position-btn {
-  background: var(--gradient-light-bg);
-  color: var(--text-light);
-  border: 1px solid var(--border-light);
-}
-
-.position-btn.add-main-title {
-  background: linear-gradient(90deg, #ff0080e7, #ff00cc);
-}
-
-body.light-mode .position-btn.add-main-title {
-  background: linear-gradient(90deg, #ff4081, #f50057);
-}
-
-.position-btn.add-subtitle {
-  background: var(--gradient-tertiary);
-}
-
-body.light-mode .position-btn.add-subtitle {
-  background: var(--gradient-tertiary-light);
-}
-
-.position-btn.add-content {
-  background: var(--gradient-secondary);
-}
-
-body.light-mode .position-btn.add-content {
-  background: var(--gradient-secondary-light);
-}
-
-/* 控制按钮 */
-.control-btn {
-  border: 1px solid var(--border-dark);
-}
-
-body.light-mode .control-btn {
-  background: var(--gradient-light-bg);
-  color: var(--text-light);
-  border: 1px solid var(--border-light);
-}
-
-.control-btn.background-selector {
-  background: var(--gradient-warning);
-  color: var(--text-light);
-}
-
-body.light-mode .control-btn.background-selector {
-  background: var(--gradient-warning-light);
-}
-
-.control-btn.export-btn {
-  background: var(--gradient-purple);
-}
-
-body.light-mode .control-btn.export-btn {
-  background: var(--gradient-purple-light);
-}
-
-.control-btn.import-btn {
-  background: var(--gradient-danger);
-}
-
-body.light-mode .control-btn.import-btn {
-  background: var(--gradient-danger-light);
-}
-
-.control-btn.theme-toggle {
-  background: var(--gradient-gray);
-}
-
-body.light-mode .control-btn.theme-toggle {
-  background: var(--gradient-gray-light);
-}
-
-.control-btn.theme-toggle .fa-sun {
-  display: none;
-}
-
-body.light-mode .control-btn.theme-toggle .fa-moon {
-  display: none;
-}
-
-body.light-mode .control-btn.theme-toggle .fa-sun {
-  display: inline-block;
-}
-
-.control-btn.opacity-control {
-  background: var(--gradient-info);
-}
-
-body.light-mode .control-btn.opacity-control {
-  background: var(--gradient-info-light);
-  color: white;
-}
-
-/* ==================== 左侧边栏 ==================== */
-.sidebar {
-  width: var(--sidebar-width);
-  min-width: var(--sidebar-width);
-  max-width: var(--sidebar-width);
-  /* background: var(--bg-dark-transparent); */
-  padding: 6px 0px;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  position: sticky;
-  left: 0;
-  top: var(--nav-height);
-  height: calc(100vh - var(--nav-height));
-  z-index: 10;
-  /* transition: background var(--transition-slow); */
-  flex-shrink: 0;
-}
-
-body.light-mode .sidebar {
-  /* background: var(--bg-light-transparent) !important; */
-  background: transparent !important;
-}
-
-/* 移除装饰线 */
-.sidebar::before,
-.content-area::before {
-  content: none;
-}
-
-.sidebar-header {
-  margin-bottom: 15px;
-  text-align: center;
-  padding: 0 5px;
-}
-
-.sidebar-header h3 {
-  font-size: 1.1rem;
-  background: linear-gradient(90deg, #00ccff, #0099cc);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  font-weight: 700;
-  margin-bottom: 3px;
-  transition: background var(--transition-slow);
-}
-
-body.light-mode .sidebar-header h3 {
-  background: linear-gradient(90deg, #0097a7, #006978);
-  -webkit-background-clip: text;
-  background-clip: text;
-}
-
-.sidebar-subtitle {
-  color: var(--text-secondary-dark);
-  font-size: 0.7rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: color var(--transition-slow);
-}
-
-body.light-mode .sidebar-subtitle {
-  color: var(--text-secondary-light);
-}
-
-/* 导航容器 */
-.nav-container {
-  position: relative;
-  flex: 1;
-  overflow: hidden;
-  top: 2%;
-  margin-left: 10px;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-
-.nav-container:hover {
-  overflow-y: auto;
-}
-
-.nav-container::-webkit-scrollbar {
-  display: none; /* Chrome, Safari, Opera */
-  width: 0;
-  height: 0;
-}
-
-.nav-container::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #00ccff, #0099cc);
-  border-radius: 5px;
-  transition: background var(--transition-slow);
-}
-
-body.light-mode .nav-container::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #0097a7, #006978);
-}
-
-.nav-items {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  padding-right: 4px;
-}
-
-/* 导航项 */
-.nav-item {
-  background: linear-gradient(
-    135deg,
-    rgba(30, 30, 50, 0.8),
-    rgba(40, 40, 70, 0.7),
-    rgba(30, 30, 50, 0.8)
+// 存储所有内容项数据 - 初始从本地存储加载或为空数组
+let contentItems = JSON.parse(localStorage.getItem("contentSystemData")) || [];
+let nextItemId = parseInt(localStorage.getItem("contentSystemNextItemId")) || 1;
+let nextContentItemId =
+  parseInt(localStorage.getItem("contentSystemNextContentItemId")) || 101;
+
+// 当前选中的背景 - 从本地存储加载
+let currentBackground = JSON.parse(
+  localStorage.getItem("contentSystemBackground"),
+) || {
+  type: "none",
+  src: "",
+  isLocalFile: false,
+};
+
+// 透明度设置 - 从本地存储加载
+let backgroundOpacity =
+  parseInt(localStorage.getItem("contentSystemOpacity")) || 30;
+let overlayOpacity =
+  parseInt(localStorage.getItem("contentSystemOverlayOpacity")) || 30;
+
+// 主题模式 - 从本地存储加载
+let isLightMode = localStorage.getItem("contentSystemTheme") === "light";
+
+// DOM元素
+const navItemsContainer = document.getElementById("navItems");
+const contentContainer = document.getElementById("contentContainer");
+const emptyState = document.getElementById("emptyState");
+const addMainTitleBtn = document.getElementById("addMainTitleBtn");
+const addSubtitleBtn = document.getElementById("addSubtitleBtn");
+const addContentBtn = document.getElementById("addContentBtn");
+const backgroundSelectorBtn = document.getElementById("backgroundSelectorBtn");
+const opacityControlBtn = document.getElementById("opacityControlBtn");
+const exportBtn = document.getElementById("exportBtn");
+const importBtn = document.getElementById("importBtn");
+const themeToggleBtn = document.getElementById("themeToggleBtn");
+const modalOverlay = document.getElementById("modalOverlay");
+const modalTitle = document.getElementById("modalTitle");
+const formLabel = document.getElementById("formLabel");
+const textareaContainer = document.getElementById("textareaContainer");
+const addMoreBtn = document.getElementById("addMoreBtn");
+const submitBtn = document.getElementById("submitBtn");
+const closeModal = document.getElementById("closeModal");
+const contentForm = document.getElementById("contentForm");
+const copyNotification = document.getElementById("copyNotification");
+const contextMenu = document.getElementById("contextMenu");
+const editContextItem = document.getElementById("editContextItem");
+const addContextItem = document.getElementById("addContextItem");
+const deleteContextItem = document.getElementById("deleteContextItem");
+const insertAfterContextItem = document.getElementById(
+  "insertAfterContextItem",
+);
+
+// 背景相关元素
+const backgroundModal = document.getElementById("backgroundModal");
+const closeBackgroundModal = document.getElementById("closeBackgroundModal");
+const backgroundTabs = document.querySelectorAll(".background-tab");
+const backgroundOptions = document.getElementById("backgroundOptions");
+const fileUploadArea = document.getElementById("fileUploadArea");
+const backgroundFileInput = document.getElementById("backgroundFileInput");
+const uploadPreview = document.getElementById("uploadPreview");
+const customBackgroundInput = document.getElementById("customBackgroundInput");
+const customPreview = document.getElementById("customPreview");
+const applyBackgroundBtn = document.getElementById("applyBackgroundBtn");
+const cancelBackgroundBtn = document.getElementById("cancelBackgroundBtn");
+const backgroundMedia = document.getElementById("background-media");
+const backgroundVideo = document.getElementById("background-video");
+const backgroundOverlay = document.getElementById("background-overlay");
+
+// 透明度相关元素
+const opacityModal = document.getElementById("opacityModal");
+const closeOpacityModal = document.getElementById("closeOpacityModal");
+const opacitySlider = document.getElementById("opacitySlider");
+const opacityValue = document.getElementById("opacityValue");
+const opacityPresetBtns = document.querySelectorAll(".opacity-preset-btn");
+const applyOpacityBtn = document.getElementById("applyOpacityBtn");
+const cancelOpacityBtn = document.getElementById("cancelOpacityBtn");
+
+// 导入导出相关元素
+const importExportModal = document.getElementById("importExportModal");
+const closeImportExportModal = document.getElementById(
+  "closeImportExportModal",
+);
+const importExportTabs = document.querySelectorAll(".import-export-tab");
+const exportDataPreview = document.getElementById("exportDataPreview");
+const importFileArea = document.getElementById("importFileArea");
+const importFileInput = document.getElementById("importFileInput");
+const importPreview = document.getElementById("importPreview");
+const exportActionBtn = document.getElementById("exportActionBtn");
+const importActionBtn = document.getElementById("importActionBtn");
+const cancelImportExportBtn = document.getElementById("cancelImportExportBtn");
+
+// 自动隐藏相关元素
+const autoHideTimeInput = document.getElementById("autoHideTimeInput");
+const enableAutoHide = document.getElementById("enableAutoHide");
+
+// 插入菜单项元素
+const insertMainTitleAfterItem = document.getElementById(
+  "insertMainTitleAfterItem",
+);
+const insertSubtitleAfterItem = document.getElementById(
+  "insertSubtitleAfterItem",
+);
+
+// 状态变量
+let currentItemType = "";
+let currentEditItemId = null;
+let currentHighlightedItem = null;
+let currentEditCardItemId = null;
+let currentContentCardId = null;
+let contextMenuTarget = null;
+let currentImportExportTab = "export";
+let currentInsertAfterId = null;
+
+let nextImageId =
+  parseInt(localStorage.getItem("contentSystemNextImageId")) || 1001;
+
+// 图片相关DOM元素
+const addImagesBtn = document.getElementById("addImagesBtn");
+const imageModal = document.getElementById("imageModal");
+const imageModalTitle = document.getElementById("imageModalTitle");
+const closeImageModal = document.getElementById("closeImageModal");
+const imageForm = document.getElementById("imageForm");
+const imageUploadArea = document.getElementById("imageUploadArea");
+const imageFileInput = document.getElementById("imageFileInput");
+const imagePreviewArea = document.getElementById("imagePreviewArea");
+const imageUrlInput = document.getElementById("imageUrlInput");
+const submitImageBtn = document.getElementById("submitImageBtn");
+const insertImagesAfterItem = document.getElementById("insertImagesAfterItem");
+
+// 图片查看器相关DOM元素
+const imageViewerModal = document.getElementById("imageViewerModal");
+const closeImageViewer = document.getElementById("closeImageViewer");
+const viewerImage = document.getElementById("viewerImage");
+const prevImageBtn = document.getElementById("prevImageBtn");
+const nextImageBtn = document.getElementById("nextImageBtn");
+const currentImageIndex = document.getElementById("currentImageIndex");
+const totalImages = document.getElementById("totalImages");
+const downloadImageBtn = document.getElementById("downloadImageBtn");
+const copyImageUrlBtn = document.getElementById("copyImageUrlBtn");
+const deleteImageBtn = document.getElementById("deleteImageBtn");
+
+// 图片查看器状态
+let currentViewingImages = [];
+let currentViewingImageIndex = 0;
+let currentViewingCardId = null;
+
+// 自动隐藏相关变量
+let autoHideEnabled = localStorage.getItem("contentSystemAutoHide") === "true";
+let autoHideTime =
+  parseInt(localStorage.getItem("contentSystemAutoHideTime")) || 20;
+let hideTimeout = null;
+let mouseInWindow = true;
+
+// 保存数据到本地存储
+function saveToLocalStorage() {
+  localStorage.setItem("contentSystemData", JSON.stringify(contentItems));
+  localStorage.setItem("contentSystemNextItemId", nextItemId.toString());
+  localStorage.setItem(
+    "contentSystemNextContentItemId",
+    nextContentItemId.toString(),
   );
-  border: 1px solid var(--border-dark);
-  border-radius: var(--radius-md);
-  padding: 4px;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  position: relative;
-  overflow: hidden;
-  min-height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-}
-
-body.light-mode .nav-item {
-  background: linear-gradient(135deg, #1e90ff, #00e5ff);
-  border: 1px solid var(--border-light);
-  color: #ffffff !important;
-  box-shadow: 0 8px 20px rgba(0, 170, 255, 0.45);
-  transition: all 0.25s ease;
-}
-
-.nav-item:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateX(2px);
-}
-
-body.light-mode .nav-item:hover {
-  background: linear-gradient(135deg, #3aa0ff, #26f0ff);
-  box-shadow:
-    0 12px 30px rgba(0, 200, 255, 0.65),
-    inset 0 1px 0 rgba(255, 255, 255, 0.35);
-  transform: translateY(-2px);
-  text-shadow: 0 0 8px rgba(255, 51, 102, 0.3);
-  color: #ff3366 !important;
-}
-
-.nav-item.active {
-  background: linear-gradient(135deg, #7b2cff, #ff4fd8);
-  border-color: rgba(0, 204, 255, 0.5);
-  transform: translateX(3px);
-}
-
-body.light-mode .nav-item.active {
-  background: linear-gradient(135deg, #7b2cff, #ff4fd8);
-  border-color: rgba(0, 151, 167, 0.5);
-  color: #fff;
-}
-
-.nav-item-title {
-  font-weight: 600;
-  font-size: 0.85rem;
-  /* color: var(--text-dark); */
-  color: white !important;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  flex: 1;
-  transition: color var(--transition-slow);
-}
-
-body.light-mode .nav-item-title {
-  color: var(--text-light);
-}
-
-.nav-item-indicator {
-  color: var(--highlight-primary);
-  font-size: 0.75rem;
-  opacity: 0;
-  transition:
-    opacity var(--transition-fast),
-    color var(--transition-slow);
-  flex-shrink: 0;
-  margin-left: 5px;
-}
-
-body.light-mode .nav-item-indicator {
-  color: var(--highlight-primary-light);
-}
-
-.nav-item.active .nav-item-indicator {
-  opacity: 1;
-}
-
-/* ==================== 右侧内容区域 ==================== */
-.content-area {
-  flex: 1;
-  /* background: var(--bg-dark-transparent) !important; */
-  background: transparent !important;
-  padding: 15px;
-  overflow-y: auto;
-  position: relative;
-  min-width: calc(var(--container-min-width) - var(--sidebar-width));
-  max-width: var(--content-max-width);
-  transition: background var(--transition-slow);
-}
-
-body.light-mode .content-area {
-  /* background: var(--bg-light-transparent) !important; */
-  background: transparent !important;
-}
-
-.content-container {
-  max-width: 100%;
-  margin: 0;
-  width: 100%;
-}
-
-/* ==================== 内容样式 ==================== */
-/* 大标题 */
-.main-title {
-  text-align: center;
-  font-size: 1.3rem;
-  font-weight: 700;
-  margin: 8px 0 20px;
-  padding: 6px;
-  background: -webkit-linear-gradient(
-    top,
-    rgba(0, 0, 0, 0.2),
-    rgba(0, 0, 0, 0.6)
+  localStorage.setItem(
+    "contentSystemBackground",
+    JSON.stringify(currentBackground),
   );
-  border-radius: var(--radius-xl);
-  border: 2px solid #fdc305;
-  color: #fdec02;
-  position: relative;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  box-shadow: 0 4px 12px rgba(255, 0, 204, 0.1);
-  scroll-margin-top: 50px;
-}
-
-body.light-mode .main-title {
-  background: -webkit-linear-gradient(
-    top,
-    rgba(0, 0, 0, 0.2),
-    rgba(0, 0, 0, 0.6)
+  localStorage.setItem("contentSystemOpacity", backgroundOpacity.toString());
+  localStorage.setItem(
+    "contentSystemOverlayOpacity",
+    overlayOpacity.toString(),
   );
-  border: 2px solid #fdc305;
-  color: #fdba00;
-  box-shadow: 0 4px 12px rgba(255, 64, 129, 0.1);
+  localStorage.setItem("contentSystemTheme", isLightMode ? "light" : "dark");
+  localStorage.setItem("contentSystemAutoHide", autoHideEnabled.toString());
+  localStorage.setItem("contentSystemAutoHideTime", autoHideTime.toString());
+  localStorage.setItem("contentSystemNextImageId", nextImageId.toString());
 }
 
-/* 小标题 */
-.subtitle {
-  width: fit-content;
-  font-size: 0.8rem;
-  font-weight: 600;
-  margin: 6px 0 6px;
-  padding: 4px 10px;
-  background: var(--gradient-title-sub);
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(51, 102, 255, 0.3);
-  color: #6699ff;
-  position: relative;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  box-shadow: 0 4px 12px rgba(51, 102, 255, 0.1);
-}
+// 初始化页面
+function initPage() {
+  if (!navItemsContainer || !contentContainer || !emptyState) {
+    console.error("必要的DOM元素未找到，等待页面加载");
+    setTimeout(initPage, 100);
+    return;
+  }
 
-body.light-mode .subtitle {
-  background: var(--gradient-title-sub);
-  border: 1px solid rgba(41, 121, 255, 0.3);
-  color: #2962ff;
-  box-shadow: 0 4px 12px rgba(41, 121, 255, 0.1);
-}
+  contentItems.sort((a, b) => a.order - b.order);
 
-/* 内容卡片 */
-.content-card {
-  background: linear-gradient(
-    135deg,
-    rgba(30, 30, 50, 0.8),
-    rgba(40, 40, 70, 0.7),
-    rgba(30, 30, 50, 0.8)
+  renderNavItems();
+  renderContent();
+
+  if (contentItems.length === 0) {
+    emptyState.style.display = "block";
+  } else {
+    emptyState.style.display = "none";
+  }
+
+  setBackground(
+    currentBackground.type,
+    currentBackground.src,
+    currentBackground.isLocalFile,
   );
-  border-radius: var(--radius-xl);
-  padding: 0;
-  margin-bottom: 12px;
-  border: 1px solid var(--border-dark);
-  box-shadow: var(--shadow-md);
-  overflow: hidden;
-  transition: all var(--transition-fast);
-  position: relative;
-  width: fit-content;
-  max-width: 100%;
-  min-width: 300px;
-  margin-left: 0;
-  margin-right: auto;
+  setOpacity(backgroundOpacity, overlayOpacity);
+  setTheme(isLightMode);
+  saveToLocalStorage();
 }
 
-body.light-mode .content-card {
-  background: linear-gradient(180deg, #fcffff 0%, #ebf8ff 45%, #c9e9fc 100%);
-  border: 1px solid var(--border-light) !important;
-  box-shadow: var(--shadow-md);
-  color: #ffffff;
+// 设置主题
+function setTheme(isLight) {
+  isLightMode = isLight;
+  if (isLightMode) {
+    document.body.classList.add("light-mode");
+  } else {
+    document.body.classList.remove("light-mode");
+  }
+  saveToLocalStorage();
 }
 
-.content-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(
-    45deg,
-    rgba(255, 0, 204, 0.05),
-    rgba(51, 102, 255, 0.05),
-    rgba(0, 204, 102, 0.05)
+function toggleTheme() {
+  setTheme(!isLightMode);
+}
+
+// 设置透明度
+function setOpacity(bgOpacity, olOpacity) {
+  backgroundOpacity = bgOpacity;
+  overlayOpacity = olOpacity;
+
+  if (backgroundMedia && backgroundMedia.style.display !== "none") {
+    backgroundMedia.style.opacity = (backgroundOpacity / 100).toFixed(2);
+  }
+
+  if (backgroundVideo && backgroundVideo.style.display !== "none") {
+    backgroundVideo.style.opacity = (backgroundOpacity / 100).toFixed(2);
+  }
+
+  if (backgroundOverlay) {
+    if (isLightMode) {
+      backgroundOverlay.style.background = `rgba(255, 255, 255, ${overlayOpacity / 100})`;
+    } else {
+      backgroundOverlay.style.background = `rgba(15, 15, 30, ${overlayOpacity / 100})`;
+    }
+  }
+
+  if (opacitySlider) {
+    opacitySlider.value = backgroundOpacity;
+  }
+
+  if (opacityValue) {
+    opacityValue.textContent = `${backgroundOpacity}%`;
+  }
+
+  saveToLocalStorage();
+}
+
+// 渲染导航项
+function renderNavItems() {
+  navItemsContainer.innerHTML = "";
+
+  const mainTitleItems = contentItems.filter(
+    (item) => item.type === "main-title",
   );
-  z-index: 0;
-  opacity: 0.6;
-  transition: background var(--transition-slow);
+
+  mainTitleItems.forEach((item) => {
+    const navItem = document.createElement("div");
+    navItem.className = "nav-item";
+    navItem.dataset.id = item.id;
+    navItem.title = item.text;
+
+    navItem.innerHTML = `
+            <div class="nav-item-title">${getPreviewText(item.text, 10)}</div>
+        `;
+
+    navItem.addEventListener("click", () => {
+      document.querySelectorAll(".nav-item").forEach((item) => {
+        item.classList.remove("active");
+      });
+      navItem.classList.add("active");
+      scrollToItem(item.id);
+    });
+
+    navItemsContainer.appendChild(navItem);
+  });
 }
 
-body.light-mode .content-card::before {
-  background: linear-gradient(
-    45deg,
-    rgba(255, 64, 129, 0.05),
-    rgba(41, 121, 255, 0.05),
-    rgba(0, 200, 83, 0.05)
+// 获取预览文本
+function getPreviewText(text, maxLength) {
+  if (!text) return "";
+  if (text.length <= maxLength) return text;
+  return text.substring(0, maxLength) + "...";
+}
+
+// 渲染内容区域
+function renderContent() {
+  contentContainer.innerHTML = "";
+
+  if (contentItems.length === 0) {
+    emptyState.style.display = "block";
+    return;
+  }
+
+  contentItems.forEach((item) => {
+    if (item.type === "main-title") {
+      renderMainTitle(item);
+    } else if (item.type === "subtitle") {
+      renderSubtitle(item);
+    } else if (item.type === "content-card") {
+      renderContentCard(item);
+    } else if (item.type === "image-card") {
+      renderImageCard(item);
+    }
+  });
+
+  emptyState.style.display = "none";
+}
+
+function renderMainTitle(item) {
+  const mainTitle = document.createElement("div");
+  mainTitle.className = "main-title";
+  mainTitle.id = `item-${item.id}`;
+  mainTitle.dataset.id = item.id;
+  mainTitle.dataset.type = item.type;
+  mainTitle.textContent = item.text;
+
+  mainTitle.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+    contextMenuTarget = { type: "main-title", id: item.id };
+    showContextMenu(e);
+  });
+
+  contentContainer.appendChild(mainTitle);
+}
+
+function renderSubtitle(item) {
+  const subtitle = document.createElement("div");
+  subtitle.className = "subtitle";
+  subtitle.id = `item-${item.id}`;
+  subtitle.dataset.id = item.id;
+  subtitle.dataset.type = item.type;
+  subtitle.textContent = item.text;
+
+  subtitle.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+    contextMenuTarget = { type: "subtitle", id: item.id };
+    showContextMenu(e);
+  });
+
+  contentContainer.appendChild(subtitle);
+}
+
+function renderContentCard(item) {
+  const contentCard = document.createElement("div");
+  contentCard.className = "content-card";
+  contentCard.id = `card-${item.id}`;
+  contentCard.dataset.id = item.id;
+  contentCard.dataset.type = "content-card";
+
+  contentCard.addEventListener("contextmenu", (e) => {
+    e.preventDefault();
+    contextMenuTarget = { type: "content-card", id: item.id };
+    showContextMenu(e);
+  });
+
+  if (item.content && item.content.length > 0) {
+    item.content.forEach((contentItem) => {
+      const contentItemElement = document.createElement("div");
+      contentItemElement.className = "content-item";
+      contentItemElement.id = `content-item-${contentItem.id}`;
+      contentItemElement.dataset.id = contentItem.id;
+      contentItemElement.dataset.cardId = item.id;
+      contentItemElement.dataset.type = "content-item";
+      contentItemElement.innerHTML = contentItem.text.replace(/\n/g, "<br>");
+
+      contentItemElement.addEventListener("click", () => {
+        navigator.clipboard.writeText(contentItem.text).then(() => {
+          showCopyNotification();
+          if (currentHighlightedItem) {
+            currentHighlightedItem.classList.remove("highlighted");
+          }
+          contentItemElement.classList.add("highlighted");
+          currentHighlightedItem = contentItemElement;
+        });
+      });
+
+      contentItemElement.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+        contextMenuTarget = {
+          type: "content-item",
+          id: contentItem.id,
+          cardId: item.id,
+        };
+        showContextMenu(e);
+      });
+
+      contentCard.appendChild(contentItemElement);
+    });
+  }
+
+  contentContainer.appendChild(contentCard);
+}
+
+// 显示右键菜单
+// 修改 showContextMenu() 函数中的条件判断
+function showContextMenu(e) {
+  contextMenu.style.left = `${e.clientX}px`;
+  contextMenu.style.top = `${e.clientY}px`;
+
+  if (contextMenuTarget) {
+    editContextItem.style.display = "flex";
+    addContextItem.style.display = "flex";
+    deleteContextItem.style.display = "flex";
+
+    if (
+      contextMenuTarget.type === "content-card" ||
+      contextMenuTarget.type === "main-title" ||
+      contextMenuTarget.type === "subtitle" ||
+      contextMenuTarget.type === "image-card" // 添加这行
+    ) {
+      insertAfterContextItem.style.display = "flex";
+      insertMainTitleAfterItem.style.display = "flex";
+      insertSubtitleAfterItem.style.display = "flex";
+      insertImagesAfterItem.style.display = "flex";
+      // 新增：编辑图片选项只在图片卡片上显示
+      const editImagesItem = document.getElementById("editImagesItem");
+      if (editImagesItem) {
+        editImagesItem.style.display =
+          contextMenuTarget.type === "image-card" ? "flex" : "none";
+      }
+    } else {
+      insertAfterContextItem.style.display = "none";
+      insertMainTitleAfterItem.style.display = "none";
+      insertSubtitleAfterItem.style.display = "none";
+      insertImagesAfterItem.style.display = "none";
+      // 隐藏编辑图片选项
+      const editImagesItem = document.getElementById("editImagesItem");
+      if (editImagesItem) {
+        editImagesItem.style.display = "none";
+      }
+    }
+  }
+
+  contextMenu.classList.add("active");
+}
+
+// 滚动到指定内容项
+function scrollToItem(itemId) {
+  const itemElement = document.getElementById(`item-${itemId}`);
+  if (itemElement) {
+    itemElement.scrollIntoView({ behavior: "smooth", block: "start" });
+
+    const originalBackground = itemElement.style.background;
+    if (isLightMode) {
+      itemElement.style.background = "rgba(255, 64, 129, 0.3)";
+    } else {
+      itemElement.style.background = "rgba(255, 0, 204, 0.3)";
+    }
+
+    setTimeout(() => {
+      itemElement.style.background = originalBackground;
+    }, 1500);
+  }
+}
+
+// 显示复制成功通知
+function showCopyNotification(message = "复制成功！", type = "content-copied") {
+  const notification = document.getElementById("copyNotification");
+  const messageSpan = notification.querySelector("span");
+  const icon = notification.querySelector("i");
+
+  // 设置消息
+  messageSpan.textContent = message;
+
+  // 设置图标
+  if (type === "image-copied") {
+    icon.className = "fas fa-image";
+  } else if (type === "image-deleted") {
+    icon.className = "fas fa-trash-alt";
+  } else if (type === "data-exported") {
+    icon.className = "fas fa-file-export";
+  } else {
+    icon.className = "fas fa-check-circle";
+  }
+
+  // 设置样式类
+  notification.className = "copy-notification show";
+  notification.classList.add(type);
+
+  // 显示通知
+  notification.classList.add("show");
+
+  // 3秒后隐藏
+  setTimeout(() => {
+    notification.classList.remove("show");
+    // 延迟移除类型类，确保动画完成
+    setTimeout(() => {
+      notification.className = "copy-notification";
+    }, 300);
+  }, 3000);
+}
+
+// 打开新增模态框
+function openAddModal(type) {
+  currentItemType = type;
+  currentEditItemId = null;
+  currentEditCardItemId = null;
+  currentContentCardId = null;
+  currentInsertAfterId = null;
+
+  textareaContainer.innerHTML = `
+        <div class="form-group textarea-group">
+            <label class="form-label" id="formLabel">内容</label>
+            <textarea class="form-input content-textarea" rows="4" placeholder="请输入内容，换行将保留格式"></textarea>
+        </div>
+    `;
+
+  let title = "";
+  switch (type) {
+    case "main-title":
+      title = "新增大标题";
+      formLabel.textContent = "大标题内容（将居中显示，并在左侧生成导航按钮）";
+      break;
+    case "subtitle":
+      title = "新增小标题";
+      formLabel.textContent = "小标题内容";
+      break;
+    case "content-card":
+      title = "新增内容卡片";
+      formLabel.textContent = "内容（支持多行文本，单击可复制）";
+      break;
+  }
+
+  modalTitle.textContent = title;
+  submitBtn.innerHTML = '<i class="fas fa-save"></i> 保存';
+  modalOverlay.classList.add("active");
+
+  setTimeout(() => {
+    const firstTextarea = document.querySelector(".content-textarea");
+    if (firstTextarea) firstTextarea.focus();
+  }, 100);
+}
+
+// 打开编辑模态框
+function openEditModal() {
+  if (!contextMenuTarget) return;
+
+  const { type, id, cardId } = contextMenuTarget;
+  textareaContainer.innerHTML = "";
+
+  if (type === "content-item") {
+    const cardIndex = contentItems.findIndex((item) => item.id === cardId);
+    if (cardIndex !== -1) {
+      const contentItem = contentItems[cardIndex].content.find(
+        (item) => item.id === id,
+      );
+      if (contentItem) {
+        const textareaGroup = document.createElement("div");
+        textareaGroup.className = "form-group textarea-group";
+        textareaGroup.innerHTML = `
+                    <label class="form-label">内容</label>
+                    <textarea class="form-input content-textarea" rows="4">${contentItem.text}</textarea>
+                `;
+        textareaContainer.appendChild(textareaGroup);
+      }
+    }
+    modalTitle.textContent = "编辑内容";
+    currentItemType = "content-item";
+    currentEditCardItemId = id;
+    currentContentCardId = cardId;
+    currentEditItemId = null;
+  } else {
+    const itemIndex = contentItems.findIndex((item) => item.id === id);
+    if (itemIndex !== -1) {
+      const item = contentItems[itemIndex];
+
+      if (type === "content-card") {
+        modalTitle.textContent = "编辑内容卡片";
+        currentItemType = "content-card";
+
+        if (item.content && item.content.length > 0) {
+          item.content.forEach((contentItem, index) => {
+            const textareaGroup = document.createElement("div");
+            textareaGroup.className = "form-group textarea-group";
+            textareaGroup.innerHTML = `
+                            <label class="form-label">内容 ${index + 1}</label>
+                            <textarea class="form-input content-textarea" rows="4">${contentItem.text}</textarea>
+                        `;
+            textareaContainer.appendChild(textareaGroup);
+          });
+        } else {
+          const textareaGroup = document.createElement("div");
+          textareaGroup.className = "form-group textarea-group";
+          textareaGroup.innerHTML = `
+                        <label class="form-label">内容</label>
+                        <textarea class="form-input content-textarea" rows="4" placeholder="请输入内容，换行将保留格式"></textarea>
+                    `;
+          textareaContainer.appendChild(textareaGroup);
+        }
+      } else {
+        const textareaGroup = document.createElement("div");
+        textareaGroup.className = "form-group textarea-group";
+
+        if (type === "main-title") {
+          modalTitle.textContent = "编辑大标题";
+          textareaGroup.innerHTML = `
+                        <label class="form-label">大标题内容</label>
+                        <textarea class="form-input content-textarea" rows="4">${item.text}</textarea>
+                    `;
+        } else if (type === "subtitle") {
+          modalTitle.textContent = "编辑小标题";
+          textareaGroup.innerHTML = `
+                        <label class="form-label">小标题内容</label>
+                        <textarea class="form-input content-textarea" rows="4">${item.text}</textarea>
+                    `;
+        }
+
+        textareaContainer.appendChild(textareaGroup);
+        currentItemType = type;
+      }
+
+      currentEditItemId = id;
+      currentEditCardItemId = null;
+      currentContentCardId = null;
+    }
+  }
+
+  submitBtn.innerHTML = '<i class="fas fa-save"></i> 更新';
+  modalOverlay.classList.add("active");
+
+  setTimeout(() => {
+    const firstTextarea = document.querySelector(".content-textarea");
+    if (firstTextarea) firstTextarea.focus();
+  }, 100);
+}
+
+// 新增函数：打开插入卡片模态框
+function openInsertAfterModal() {
+  if (!contextMenuTarget) return;
+
+  const { type, id } = contextMenuTarget;
+  currentItemType = "content-card";
+  currentInsertAfterId = id;
+
+  textareaContainer.innerHTML = `
+        <div class="form-group textarea-group">
+            <label class="form-label">卡片内容（支持多行文本，单击可复制）</label>
+            <textarea class="form-input content-textarea" rows="4" placeholder="请输入卡片内容，换行将保留格式"></textarea>
+        </div>
+    `;
+
+  modalTitle.textContent = "插入内容卡片";
+  formLabel.textContent = "卡片内容（支持多行文本，单击可复制）";
+  submitBtn.innerHTML = '<i class="fas fa-save"></i> 插入卡片';
+  modalOverlay.classList.add("active");
+
+  setTimeout(() => {
+    const firstTextarea = document.querySelector(".content-textarea");
+    if (firstTextarea) firstTextarea.focus();
+  }, 100);
+}
+
+// 新增函数：打开插入大标题模态框
+function openInsertMainTitleAfterModal() {
+  if (!contextMenuTarget) return;
+
+  const { type, id } = contextMenuTarget;
+  currentItemType = "main-title";
+  currentInsertAfterId = id;
+
+  textareaContainer.innerHTML = `
+        <div class="form-group textarea-group">
+            <label class="form-label">大标题内容</label>
+            <textarea class="form-input content-textarea" rows="4" placeholder="请输入大标题内容"></textarea>
+        </div>
+    `;
+
+  modalTitle.textContent = "插入大标题";
+  formLabel.textContent = "大标题内容";
+  submitBtn.innerHTML = '<i class="fas fa-save"></i> 插入大标题';
+  modalOverlay.classList.add("active");
+
+  setTimeout(() => {
+    const firstTextarea = document.querySelector(".content-textarea");
+    if (firstTextarea) firstTextarea.focus();
+  }, 100);
+}
+
+// 新增函数：打开插入小标题模态框
+function openInsertSubtitleAfterModal() {
+  if (!contextMenuTarget) return;
+
+  const { type, id } = contextMenuTarget;
+  currentItemType = "subtitle";
+  currentInsertAfterId = id;
+
+  textareaContainer.innerHTML = `
+        <div class="form-group textarea-group">
+            <label class="form-label">小标题内容</label>
+            <textarea class="form-input content-textarea" rows="4" placeholder="请输入小标题内容"></textarea>
+        </div>
+    `;
+
+  modalTitle.textContent = "插入小标题";
+  formLabel.textContent = "小标题内容";
+  submitBtn.innerHTML = '<i class="fas fa-save"></i> 插入小标题';
+  modalOverlay.classList.add("active");
+
+  setTimeout(() => {
+    const firstTextarea = document.querySelector(".content-textarea");
+    if (firstTextarea) firstTextarea.focus();
+  }, 100);
+}
+
+// 新增文本区域
+function addNewTextarea() {
+  const textareaGroup = document.createElement("div");
+  textareaGroup.className = "form-group textarea-group";
+  textareaGroup.innerHTML = `
+        <label class="form-label">内容 ${textareaContainer.children.length + 1}</label>
+        <textarea class="form-input content-textarea" rows="4" placeholder="请输入内容，换行将保留格式"></textarea>
+    `;
+  textareaContainer.appendChild(textareaGroup);
+}
+
+// 在指定项目后面插入新卡片
+function insertContentAfter(targetId, newItem) {
+  const targetIndex = contentItems.findIndex((item) => item.id === targetId);
+
+  if (targetIndex !== -1) {
+    contentItems.splice(targetIndex + 1, 0, newItem);
+    contentItems.forEach((item, index) => {
+      item.order = index + 1;
+    });
+  } else {
+    contentItems.push(newItem);
+  }
+}
+
+// 保存内容项
+// 修改后的保存内容项函数 - 完整版
+async function saveContentItem(e) {
+  e.preventDefault();
+
+  const textareas = document.querySelectorAll(".content-textarea");
+  const contents = Array.from(textareas)
+    .map((ta) => ta.value.trim())
+    .filter((text) => text !== "");
+
+  // 1. 替换原有的系统 alert
+  if (contents.length === 0) {
+    await Modal.alert("请至少输入一个内容区域，不能为空！", "输入提示");
+    return;
+  }
+
+  const isInsertOperation =
+    currentInsertAfterId &&
+    (submitBtn.innerHTML.includes("插入卡片") ||
+      submitBtn.innerHTML.includes("插入大标题") ||
+      submitBtn.innerHTML.includes("插入小标题"));
+
+  if (currentItemType === "content-item" && currentEditCardItemId) {
+    // 情况 A: 编辑卡片内部的某一项
+    const cardIndex = contentItems.findIndex(
+      (item) => item.id === currentContentCardId,
+    );
+
+    if (cardIndex !== -1) {
+      const contentItemIndex = contentItems[cardIndex].content.findIndex(
+        (item) => item.id === currentEditCardItemId,
+      );
+
+      if (contentItemIndex !== -1) {
+        contentItems[cardIndex].content[contentItemIndex].text = contents[0];
+      }
+    }
+  } else if (currentEditItemId) {
+    // 情况 B: 编辑整个卡片或标题
+    const itemIndex = contentItems.findIndex(
+      (item) => item.id === currentEditItemId,
+    );
+
+    if (itemIndex !== -1) {
+      if (currentItemType === "content-card") {
+        contentItems[itemIndex].content = contents.map((text, index) => ({
+          id: contentItems[itemIndex].content[index]?.id || nextContentItemId++,
+          type: "content",
+          text,
+        }));
+      } else {
+        contentItems[itemIndex].text = contents[0];
+      }
+    }
+  } else if (isInsertOperation) {
+    // 情况 C: 插入操作（右键菜单触发）
+    let newItem;
+
+    if (currentItemType === "content-card") {
+      newItem = {
+        id: nextItemId++,
+        type: "content-card",
+        content: contents.map((text) => ({
+          id: nextContentItemId++,
+          type: "content",
+          text,
+        })),
+        order: 0,
+        parentId: null,
+      };
+    } else if (currentItemType === "main-title") {
+      newItem = {
+        id: nextItemId++,
+        type: "main-title",
+        text: contents[0],
+        order: 0,
+        parentId: null,
+      };
+    } else if (currentItemType === "subtitle") {
+      newItem = {
+        id: nextItemId++,
+        type: "subtitle",
+        text: contents[0],
+        order: 0,
+        parentId: null,
+      };
+    }
+
+    insertContentAfter(currentInsertAfterId, newItem);
+    currentInsertAfterId = null;
+  } else {
+    // 情况 D: 普通新增操作（页面底部按钮触发）
+    let newItem;
+
+    if (currentItemType === "content-card") {
+      newItem = {
+        id: nextItemId++,
+        type: "content-card",
+        content: contents.map((text) => ({
+          id: nextContentItemId++,
+          type: "content",
+          text,
+        })),
+        order: contentItems.length + 1,
+        parentId: null,
+      };
+    } else {
+      newItem = {
+        id: nextItemId++,
+        type: currentItemType,
+        text: contents[0],
+        order: contentItems.length + 1,
+        parentId: null,
+      };
+    }
+
+    contentItems.push(newItem);
+  }
+
+  // 重置表单并保存数据
+  contentForm.reset();
+  modalOverlay.classList.remove("active");
+  initPage();
+  saveToLocalStorage(); // 确保保存到本地存储
+
+  // 如果是插入操作，执行滚动定位和高亮效果
+  if (isInsertOperation) {
+    setTimeout(() => {
+      const newItemId = nextItemId - 1;
+      const newItemElement =
+        currentItemType === "content-card"
+          ? document.getElementById(`card-${newItemId}`)
+          : document.getElementById(`item-${newItemId}`);
+
+      if (!newItemElement) return;
+
+      newItemElement.scrollIntoView({ behavior: "smooth", block: "start" });
+
+      const originalBg = newItemElement.style.background;
+
+      // 根据模式和类型设置高亮颜色
+      if (isLightMode) {
+        if (currentItemType === "main-title") {
+          newItemElement.style.background = "rgba(255, 64, 129, 0.3)";
+        } else if (currentItemType === "subtitle") {
+          newItemElement.style.background = "rgba(41, 121, 255, 0.3)";
+        } else {
+          newItemElement.style.background = "rgba(0, 200, 83, 0.3)";
+        }
+      } else {
+        if (currentItemType === "main-title") {
+          newItemElement.style.background = "rgba(255, 0, 204, 0.3)";
+        } else if (currentItemType === "subtitle") {
+          newItemElement.style.background = "rgba(51, 102, 255, 0.3)";
+        } else {
+          newItemElement.style.background = "rgba(0, 204, 102, 0.3)";
+        }
+      }
+
+      // 1.5秒后恢复原始背景
+      setTimeout(() => {
+        newItemElement.style.background = originalBg;
+      }, 1500);
+
+      // 如果是大标题，刷新导航栏
+      if (currentItemType === "main-title") {
+        if (typeof renderNavItems === "function") {
+          renderNavItems();
+          setTimeout(() => {
+            document.querySelectorAll(".nav-item").forEach((item) => {
+              item.classList.remove("active");
+              if (parseInt(item.dataset.id) === newItemId) {
+                item.classList.add("active");
+              }
+            });
+          }, 100);
+        }
+      }
+    }, 300);
+  }
+}
+
+// 删除内容项
+async function deleteContentItem() {
+  if (!contextMenuTarget) return;
+
+  // 1. 在 await 之前，先解构保存需要的数据
+  // 因为 Modal 弹窗是异步的，如果中途 contextMenuTarget 被其他操作清空，逻辑会失效
+  const { type, id, cardId } = contextMenuTarget;
+
+  // 2. 调用自定义确认弹窗
+  const isConfirmed = await Modal.confirm(
+    "确定要删除这个内容吗？删除后无法恢复。",
+    "确认删除",
   );
-}
 
-.content-card:hover {
-  transform: translateY(-3px);
-  box-shadow: var(--shadow-xl);
-  border-color: rgba(0, 204, 255, 0.3);
-}
+  if (!isConfirmed) return;
 
-body.light-mode .content-card:hover {
-  box-shadow: var(--shadow-xl);
-  border-color: rgba(0, 176, 255, 0.3);
-}
+  // 3. 执行删除逻辑
+  if (type === "content-item") {
+    // 情况 A: 删除卡片内部的某一项
+    const cardIndex = contentItems.findIndex((item) => item.id === cardId);
+    if (cardIndex !== -1) {
+      contentItems[cardIndex].content = contentItems[cardIndex].content.filter(
+        (item) => item.id !== id,
+      );
+    }
+  } else {
+    // 情况 B: 删除整个卡片 (标题卡、图片卡等)
+    contentItems = contentItems.filter((item) => item.id !== id);
 
-/* ==================== 内容项 ==================== */
-.content-item {
-  padding: 6px 10px;
-  border-bottom: 1px solid var(--border-secondary-dark);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  line-height: 1.6;
-  white-space: pre-wrap;
-  position: relative;
-  font-size: 1rem;
-  z-index: 1;
-  background: rgba(255, 255, 255, 0.03);
-  color: var(--text-dark);
-}
-
-body.light-mode .content-item {
-  border-bottom: 1px solid var(--border-secondary-light);
-  /* background: rgba(255, 255, 255, 1) !important; */
-  /* background: linear-gradient(
-    135deg,
-    rgba(248, 252, 255, 0.9),
-    rgba(230, 240, 255, 0.95),
-    rgba(212, 233, 252, 0.9)
-  ) !important; */
-  color: var(--text-light);
-}
-
-.content-item:last-child {
-  border-bottom: none;
-}
-
-/* 修复后的悬停效果 */
-.content-item:hover {
-  background: var(--hover-gradient) !important;
-  color: white !important;
-}
-
-body.light-mode .content-item:hover {
-  background: var(--hover-gradient) !important;
-  color: #fdfdfd !important;
-}
-
-/* 高亮效果（点击后） */
-.content-item.highlighted {
-  background: linear-gradient(135deg, #7b2cff, #ff4fd8) !important;
-  animation: highlight-pulse 2s infinite;
-  border-left: 4px solid var(--highlight-accent);
-  border-radius: 8px;
-  position: relative;
-  z-index: 1;
-}
-
-body.light-mode .content-item.highlighted {
-  background: linear-gradient(135deg, #7b2cff, #ff4fd8) !important;
-  border-left: 4px solid var(--highlight-accent-light);
-  font-weight: 550;
-  color: #fff;
-  border-radius: 8px;
-}
-
-/* 高亮项悬停效果 */
-.content-item.highlighted:hover {
-  background: linear-gradient(135deg, #7b2cff, #ff4fd8) !important;
-  animation: highlight-pulse 1s infinite;
-  color: white !important;
-}
-
-body.light-mode .content-item.highlighted:hover {
-  background: linear-gradient(135deg, #7b2cff, #ff4fd8) !important;
-  color: #ffffff !important;
-  font-weight: 550;
-}
-
-@keyframes highlight-pulse {
-  0% {
-    box-shadow: inset 0 0 0 0 rgba(255, 0, 204, 0.4);
+    // 重新排序
+    contentItems.forEach((item, index) => {
+      item.order = index + 1;
+    });
   }
-  70% {
-    box-shadow: inset 0 0 0 6px rgba(255, 0, 204, 0);
-  }
-  100% {
-    box-shadow: inset 0 0 0 0 rgba(255, 0, 204, 0);
+
+  // 4. 更新界面并保存
+  initPage();
+  saveToLocalStorage(); // 记得调用保存，确保刷新后删除依然生效
+
+  // 5. 显示删除成功通知
+  if (typeof showCopyNotification === "function") {
+    showCopyNotification();
+    const notifySpan = document.querySelector("#copyNotification span");
+    if (notifySpan) notifySpan.textContent = "内容已删除";
   }
 }
 
-/* ==================== 通用模态框样式 ==================== */
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.85);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
-  opacity: 0;
-  visibility: hidden;
-  transition: all var(--transition-fast);
-}
-
-body.light-mode .modal-overlay {
-  background: rgba(0, 0, 0, 0.7);
-}
-
-.modal-overlay.active {
-  opacity: 1;
-  visibility: visible;
-}
-
-.modal-content,
-.background-modal-content,
-.opacity-modal-content,
-.import-export-modal-content {
-  background: var(--gradient-dark-bg-alt);
-  width: 90%;
-  max-width: 600px;
-  border-radius: var(--radius-2xl);
-  padding: 20px;
-  box-shadow: var(--shadow-3xl);
-  border: 1px solid var(--border-dark);
-  transform: translateY(50px);
-  transition: transform var(--transition-medium);
-}
-
-body.light-mode .modal-content,
-body.light-mode .background-modal-content,
-body.light-mode .opacity-modal-content,
-body.light-mode .import-export-modal-content {
-  background: rgba(255, 255, 255, 1) !important;
-  border: 1px solid var(--border-light);
-  box-shadow: var(--shadow-3xl);
-}
-
-.modal-overlay.active .modal-content,
-.modal-overlay.active .background-modal-content,
-.modal-overlay.active .opacity-modal-content,
-.modal-overlay.active .import-export-modal-content {
-  transform: translateY(0);
-}
-
-/* 模态框头部 */
-.modal-header,
-.background-modal-header,
-.opacity-modal-header,
-.import-export-modal-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
-  padding-bottom: 10px;
-  border-bottom: 1px solid var(--border-dark);
-}
-
-body.light-mode .modal-header,
-body.light-mode .background-modal-header,
-body.light-mode .opacity-modal-header,
-body.light-mode .import-export-modal-header {
-  border-bottom: 1px solid var(--border-light);
-}
-
-.modal-title,
-.background-modal-title,
-.opacity-modal-title,
-.import-export-modal-title {
-  font-size: 1.4rem;
-  font-weight: 700;
-  background: var(--gradient-primary);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  transition: background var(--transition-slow);
-}
-
-body.light-mode .modal-title,
-body.light-mode .background-modal-title,
-body.light-mode .opacity-modal-title,
-body.light-mode .import-export-modal-title {
-  background: var(--gradient-primary-light);
-  -webkit-background-clip: text;
-  background-clip: text;
-}
-
-.background-modal-title {
-  background: var(--gradient-warning);
-}
-
-body.light-mode .background-modal-title {
-  background: var(--gradient-warning-light);
-}
-
-.opacity-modal-title {
-  background: var(--gradient-info);
-}
-
-.import-export-modal-title {
-  background: var(--gradient-purple);
-}
-
-body.light-mode .import-export-modal-title {
-  background: var(--gradient-purple-light);
-}
-
-/* 关闭按钮 */
-.close-modal {
-  background: none;
-  border: none;
-  color: var(--text-secondary-dark);
-  font-size: 1.5rem;
-  cursor: pointer;
-  transition: color var(--transition-fast);
-}
-
-body.light-mode .close-modal {
-  color: var(--text-secondary-light);
-}
-
-.close-modal:hover {
-  color: var(--highlight-accent);
-}
-
-body.light-mode .close-modal:hover {
-  color: var(--highlight-accent-light);
-}
-
-/* ==================== 表单样式 ==================== */
-.form-group {
-  margin-bottom: 12px;
-}
-
-.form-label {
-  display: block;
-  margin-bottom: 6px;
-  font-weight: 600;
-  color: var(--text-secondary-dark);
-  font-size: 0.9rem;
-  transition: color var(--transition-slow);
-}
-
-body.light-mode .form-label {
-  color: var(--text-muted-light);
-}
-
-.form-input {
-  width: 100%;
-  padding: 10px 12px;
-  background: rgba(10, 10, 25, 0.8);
-  border: 1px solid var(--border-dark);
-  border-radius: var(--radius-lg);
-  color: var(--text-dark);
-  font-size: 0.9rem;
-  transition: all var(--transition-fast);
-  resize: vertical;
-  min-height: 80px;
-}
-
-body.light-mode .form-input {
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid var(--border-light);
-  color: var(--text-light);
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: var(--highlight-primary);
-  box-shadow: 0 0 0 2px rgba(0, 204, 255, 0.2);
-}
-
-body.light-mode .form-input:focus {
-  border-color: #00b0ff;
-  box-shadow: 0 0 0 2px rgba(0, 176, 255, 0.2);
-}
-
-.textarea-container {
-  margin-bottom: 10px;
-}
-
-/* ==================== 模态框按钮 ==================== */
-.add-more-btn {
-  background: var(--gradient-secondary);
-  color: white;
-  border: none;
-  border-radius: var(--radius-lg);
-  padding: 8px 15px;
-  font-size: 0.9rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin-top: 10px;
-}
-
-body.light-mode .add-more-btn {
-  background: var(--gradient-secondary-light);
-}
-
-.add-more-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 5px 15px rgba(0, 204, 102, 0.3);
-}
-
-.submit-btn {
-  background: var(--gradient-primary);
-  color: white;
-  border: none;
-  border-radius: var(--radius-lg);
-  padding: 12px 20px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  width: 100%;
-  margin-top: 10px;
-  box-shadow: 0 5px 15px rgba(255, 0, 204, 0.3);
-}
-
-body.light-mode .submit-btn {
-  background: var(--gradient-primary-light);
-  box-shadow: 0 5px 15px rgba(255, 64, 129, 0.3);
-}
-
-.submit-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(255, 0, 204, 0.5);
-}
-
-body.light-mode .submit-btn:hover {
-  box-shadow: 0 8px 25px rgba(255, 64, 129, 0.5);
-}
-
-/* ==================== 通知和右键菜单 ==================== */
-/* 复制成功提示 */
-.copy-notification {
-  position: fixed;
-  top: 85px;
-  right: 15px;
-  background: linear-gradient(90deg, #00cc88, #00aa66);
-  color: white;
-  padding: 10px 16px;
-  border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transform: translateX(150%);
-  transition: transform var(--transition-slow);
-}
-
-body.light-mode .copy-notification {
-  background: linear-gradient(90deg, #00c853, #00a152);
-}
-
-.copy-notification.show {
-  transform: translateX(0);
-}
-
-/* 右键菜单 */
-.context-menu {
-  position: fixed;
-  background: rgba(30, 30, 50, 0.95);
-  border-radius: var(--radius-lg);
-  padding: 8px 0;
-  min-width: 150px;
-  box-shadow: var(--shadow-2xl);
-  border: 1px solid var(--border-dark);
-  backdrop-filter: blur(10px);
-  z-index: 3000;
-  opacity: 0;
-  visibility: hidden;
-  transform: scale(0.9);
-  transition: all 0.2s ease;
-}
-
-body.light-mode .context-menu {
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid var(--border-light);
-  box-shadow: var(--shadow-2xl);
-}
-
-.context-menu.active {
-  opacity: 1;
-  visibility: visible;
-  transform: scale(1);
-}
-
-.context-menu-item {
-  padding: 8px 12px;
-  cursor: pointer;
-  transition: all 0.2s;
-  color: var(--text-secondary-dark);
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.85rem;
-}
-
-body.light-mode .context-menu-item {
-  color: var(--text-muted-light);
-}
-
-.context-menu-item:hover {
-  background: rgba(255, 0, 204, 0.2);
-  color: #fff;
-}
-
-body.light-mode .context-menu-item:hover {
-  background: rgba(255, 64, 129, 0.2);
-  color: #333;
-}
-
-/* ==================== 背景选择模态框 ==================== */
-.background-modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.85);
-  z-index: 2001;
-  justify-content: center;
-  align-items: center;
-}
-
-body.light-mode .background-modal {
-  background: rgba(0, 0, 0, 0.7);
-}
-
-.background-modal.active {
-  display: flex;
-}
-
-.background-modal-content {
-  backdrop-filter: blur(10px);
-  max-width: 500px;
-}
-
-.background-tabs {
-  display: flex;
-  gap: 5px;
-  margin-bottom: 15px;
-  border-bottom: 1px solid var(--border-dark);
-}
-
-body.light-mode .background-tabs {
-  border-bottom: 1px solid var(--border-light);
-}
-
-.background-tab {
-  padding: 8px 15px;
-  background: rgba(255, 255, 255, 0.05);
-  border: none;
-  border-radius: 5px 5px 0 0;
-  color: var(--text-secondary-dark);
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-body.light-mode .background-tab {
-  background: rgba(0, 0, 0, 0.03);
-  color: var(--text-secondary-light);
-}
-
-.background-tab.active {
-  background: rgba(255, 153, 0, 0.2);
-  color: var(--highlight-warning);
-  border-bottom: 2px solid var(--highlight-warning);
-}
-
-body.light-mode .background-tab.active {
-  background: rgba(255, 152, 0, 0.2);
-  color: var(--highlight-warning-light);
-  border-bottom: 2px solid var(--highlight-warning-light);
-}
-
-.background-tab:hover:not(.active) {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-body.light-mode .background-tab:hover:not(.active) {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-.background-tab-content {
-  display: none;
-}
-
-.background-tab-content.active {
-  display: block;
-}
-
-.background-options {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.background-option {
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: var(--radius-lg);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-  border: 1px solid var(--border-dark);
-}
-
-body.light-mode .background-option {
-  background: rgba(0, 0, 0, 0.03);
-  border: 1px solid var(--border-light);
-}
-
-.background-option:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateY(-2px);
-}
-
-body.light-mode .background-option:hover {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-.background-option.selected {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 153, 0, 0.2),
-    rgba(255, 204, 0, 0.2)
-  );
-  border-color: rgba(255, 153, 0, 0.5);
-}
-
-body.light-mode .background-option.selected {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 152, 0, 0.2),
-    rgba(255, 183, 77, 0.2)
-  );
-  border-color: rgba(255, 152, 0, 0.5);
-}
-
-.background-option-title {
-  font-weight: 600;
-  margin-bottom: 5px;
-  color: #fff;
-  transition: color var(--transition-slow);
-}
-
-body.light-mode .background-option-title {
-  color: var(--text-light);
-}
-
-.background-option-description {
-  font-size: 0.85rem;
-  color: var(--text-secondary-dark);
-  transition: color var(--transition-slow);
-}
-
-body.light-mode .background-option-description {
-  color: var(--text-secondary-light);
-}
-
-.file-upload-area {
-  margin-top: 15px;
-  padding: 15px;
-  border: 2px dashed var(--border-dark);
-  border-radius: var(--radius-lg);
-  text-align: center;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-body.light-mode .file-upload-area {
-  border: 2px dashed var(--border-light);
-}
-
-.file-upload-area:hover {
-  border-color: #ff9900;
-  background: rgba(255, 153, 0, 0.05);
-}
-
-body.light-mode .file-upload-area:hover {
-  background: rgba(255, 152, 0, 0.05);
-}
-
-.file-upload-area i {
-  font-size: 2rem;
-  color: #ff9900;
-  margin-bottom: 10px;
-}
-
-body.light-mode .file-upload-area i {
-  color: #ff9800;
-}
-
-.file-upload-area p {
-  color: var(--text-secondary-dark);
-  font-size: 0.9rem;
-  transition: color var(--transition-slow);
-}
-
-body.light-mode .file-upload-area p {
-  color: var(--text-secondary-light);
-}
-
-.file-input {
-  display: none;
-}
-
-.background-custom-input {
-  margin-top: 15px;
-}
-
-.background-custom-input input {
-  width: 100%;
-  padding: 10px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-dark);
-  border-radius: var(--radius-md);
-  color: #fff;
-  font-size: 0.9rem;
-  margin-top: 5px;
-}
-
-body.light-mode .background-custom-input input {
-  background: rgba(0, 0, 0, 0.03);
-  border: 1px solid var(--border-light);
-  color: var(--text-light);
-}
-
-.background-custom-input input:focus {
-  outline: none;
-  border-color: #ff9900;
-}
-
-body.light-mode .background-custom-input input:focus {
-  border-color: #ff9800;
-}
-
-.preview-area {
-  margin-top: 15px;
-  padding: 10px;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: var(--radius-lg);
-  text-align: center;
-  min-height: 100px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-}
-
-body.light-mode .preview-area {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-.preview-area img,
-.preview-area video {
-  max-width: 100%;
-  max-height: 200px;
-  border-radius: var(--radius-sm);
-}
-
-.background-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.background-action-btn {
-  flex: 1;
-  padding: 10px;
-  border: none;
-  border-radius: var(--radius-md);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.background-action-btn.apply {
-  background: var(--gradient-warning);
-  color: var(--text-light);
-}
-
-body.light-mode .background-action-btn.apply {
-  background: var(--gradient-warning-light);
-}
-
-.background-action-btn.cancel {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-}
-
-body.light-mode .background-action-btn.cancel {
-  background: rgba(0, 0, 0, 0.05);
-  color: var(--text-light);
-}
-
-.background-action-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
-
-/* ==================== 透明度控制模态框 ==================== */
-.opacity-modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.85);
-  z-index: 2003;
-  justify-content: center;
-  align-items: center;
-}
-
-body.light-mode .opacity-modal {
-  background: rgba(0, 0, 0, 0.7);
-}
-
-.opacity-modal.active {
-  display: flex;
-}
-
-.opacity-modal-content {
-  backdrop-filter: blur(10px);
-  max-width: 400px;
-}
-
-.opacity-control-group {
-  margin-bottom: 20px;
-}
-
-.opacity-slider-container {
-  margin-top: 15px;
-}
-
-.opacity-slider {
-  width: 100%;
-  height: 8px;
-  -webkit-appearance: none;
-  appearance: none;
-  background: linear-gradient(
-    90deg,
-    rgba(0, 150, 136, 0.3),
-    rgba(77, 182, 172, 0.8)
-  );
-  border-radius: var(--radius-sm);
-  outline: none;
-}
-
-.opacity-slider::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--gradient-info);
-  cursor: pointer;
-  border: 2px solid white;
-  box-shadow: var(--shadow-sm);
-}
-
-.opacity-slider::-moz-range-thumb {
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: var(--gradient-info);
-  cursor: pointer;
-  border: 2px solid white;
-  box-shadow: var(--shadow-sm);
-}
-
-.opacity-value {
-  text-align: center;
-  margin-top: 10px;
-  font-size: 1.2rem;
-  font-weight: 600;
-  color: var(--highlight-primary);
-}
-
-body.light-mode .opacity-value {
-  color: #009688;
-}
-
-.opacity-presets {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 15px;
-}
-
-.opacity-preset-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border-dark);
-  border-radius: var(--radius-md);
-  padding: 8px 12px;
-  color: var(--text-secondary-dark);
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-body.light-mode .opacity-preset-btn {
-  background: rgba(0, 0, 0, 0.03);
-  border: 1px solid var(--border-light);
-  color: var(--text-secondary-light);
-}
-
-.opacity-preset-btn:hover {
-  background: rgba(0, 150, 136, 0.2);
-  color: white;
-}
-
-body.light-mode .opacity-preset-btn:hover {
-  background: rgba(0, 150, 136, 0.2);
-  color: var(--text-light);
-}
-
-.opacity-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.opacity-action-btn {
-  flex: 1;
-  padding: 10px;
-  border: none;
-  border-radius: var(--radius-md);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.opacity-action-btn.apply {
-  background: var(--gradient-info);
-  color: white;
-}
-
-.opacity-action-btn.cancel {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-}
-
-body.light-mode .opacity-action-btn.cancel {
-  background: rgba(0, 0, 0, 0.05);
-  color: var(--text-light);
-}
-
-.opacity-action-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
-
-/* ==================== 自动隐藏设置 ==================== */
-.auto-hide-container {
-  margin-top: 15px;
-  padding: 15px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-dark);
-}
-
-body.light-mode .auto-hide-container {
-  background: rgba(0, 0, 0, 0.03);
-  border: 1px solid var(--border-light);
-}
-
-.time-input-group {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 15px;
-}
-
-.time-input {
-  width: 80px;
-  padding: 8px 12px;
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: var(--radius-md);
-  color: #fff;
-  font-size: 1rem;
-  text-align: center;
-}
-
-body.light-mode .time-input {
-  background: rgba(0, 0, 0, 0.05);
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  color: var(--text-light);
-}
-
-.time-input:focus {
-  outline: none;
-  border-color: var(--highlight-primary);
-}
-
-body.light-mode .time-input:focus {
-  border-color: #00b0ff;
-}
-
-.time-unit {
-  color: var(--text-secondary-dark);
-  font-size: 0.9rem;
-}
-
-body.light-mode .time-unit {
-  color: var(--text-secondary-light);
-}
-
-.auto-hide-options {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.auto-hide-option {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  color: var(--text-secondary-dark);
-}
-
-body.light-mode .auto-hide-option {
-  color: var(--text-muted-light);
-}
-
-.auto-hide-option input[type="checkbox"] {
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-}
-
-.auto-hide-description {
-  font-size: 0.8rem;
-  color: var(--text-muted-dark);
-  margin-top: 5px;
-  line-height: 1.4;
-}
-
-body.light-mode .auto-hide-description {
-  color: var(--text-muted-light);
-}
-
-/* ==================== 导入导出模态框 ==================== */
-.import-export-modal {
-  display: none;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.85);
-  z-index: 2002;
-  justify-content: center;
-  align-items: center;
-}
-
-body.light-mode .import-export-modal {
-  background: rgba(0, 0, 0, 0.7);
-}
-
-.import-export-modal.active {
-  display: flex;
-}
-
-.import-export-modal-content {
-  backdrop-filter: blur(10px);
-  max-width: 500px;
-}
-
-.import-export-tabs {
-  display: flex;
-  gap: 5px;
-  margin-bottom: 15px;
-  border-bottom: 1px solid var(--border-dark);
-}
-
-body.light-mode .import-export-tabs {
-  border-bottom: 1px solid var(--border-light);
-}
-
-.import-export-tab {
-  padding: 8px 15px;
-  background: rgba(255, 255, 255, 0.05);
-  border: none;
-  border-radius: 5px 5px 0 0;
-  color: var(--text-secondary-dark);
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-body.light-mode .import-export-tab {
-  background: rgba(0, 0, 0, 0.03);
-  color: var(--text-secondary-light);
-}
-
-.import-export-tab.active {
-  background: rgba(153, 51, 255, 0.2);
-  color: #cc66ff;
-  border-bottom: 2px solid #cc66ff;
-}
-
-body.light-mode .import-export-tab.active {
-  background: rgba(124, 77, 255, 0.2);
-  color: #7c4dff;
-  border-bottom: 2px solid #7c4dff;
-}
-
-.import-export-tab:hover:not(.active) {
-  background: rgba(255, 255, 255, 0.1);
-}
-
-body.light-mode .import-export-tab:hover:not(.active) {
-  background: rgba(0, 0, 0, 0.05);
-}
-
-.import-export-tab-content {
-  display: none;
-}
-
-.import-export-tab-content.active {
-  display: block;
-}
-
-.export-options {
-  margin-bottom: 20px;
-}
-
-.export-option {
-  margin-bottom: 10px;
-}
-
-.export-option label {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-  color: var(--text-secondary-dark);
-  transition: color var(--transition-slow);
-}
-
-body.light-mode .export-option label {
-  color: var(--text-muted-light);
-}
-
-.export-data-preview {
-  margin-top: 15px;
-  padding: 10px;
-  background: rgba(0, 0, 0, 0.3);
-  border-radius: var(--radius-lg);
-  max-height: 200px;
-  overflow-y: auto;
-  font-family: monospace;
-  font-size: 0.85rem;
-  white-space: pre-wrap;
-  color: var(--text-secondary-dark);
-  transition:
-    background var(--transition-slow),
-    color var(--transition-slow);
-}
-
-body.light-mode .export-data-preview {
-  background: rgba(0, 0, 0, 0.05);
-  color: var(--text-muted-light);
-}
-
-.import-file-area {
-  margin-top: 15px;
-  padding: 20px;
-  border: 2px dashed var(--border-dark);
-  border-radius: var(--radius-lg);
-  text-align: center;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-body.light-mode .import-file-area {
-  border: 2px dashed var(--border-light);
-}
-
-.import-file-area:hover {
-  border-color: #ff3366;
-  background: rgba(255, 51, 102, 0.05);
-}
-
-body.light-mode .import-file-area:hover {
-  background: rgba(255, 82, 82, 0.05);
-}
-
-.import-file-area i {
-  font-size: 2rem;
-  color: #ff3366;
-  margin-bottom: 10px;
-}
-
-body.light-mode .import-file-area i {
-  color: #ff5252;
-}
-
-.import-file-area p {
-  color: var(--text-secondary-dark);
-  font-size: 0.9rem;
-  transition: color var(--transition-slow);
-}
-
-body.light-mode .import-file-area p {
-  color: var(--text-secondary-light);
-}
-
-.import-file-input {
-  display: none;
-}
-
-.import-export-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.import-export-action-btn {
-  flex: 1;
-  padding: 10px;
-  border: none;
-  border-radius: var(--radius-md);
-  font-weight: 600;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.import-export-action-btn.primary {
-  background: var(--gradient-purple);
-  color: #fff;
-}
-
-body.light-mode .import-export-action-btn.primary {
-  background: var(--gradient-purple-light);
-}
-
-.import-export-action-btn.secondary {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-}
-
-body.light-mode .import-export-action-btn.secondary {
-  background: rgba(0, 0, 0, 0.05);
-  color: var(--text-light);
-}
-
-.import-export-action-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-}
-
-/* ==================== 空状态 ==================== */
-.empty-state {
-  text-align: center;
-  padding: 40px 15px;
-  color: var(--text-secondary-dark);
-  backdrop-filter: blur(5px);
-  background: rgba(30, 30, 50, 0.5);
-  border-radius: var(--radius-2xl);
-  margin-top: 30px;
-  transition:
-    background var(--transition-slow),
-    color var(--transition-slow);
-}
-
-body.light-mode .empty-state {
-  color: var(--text-muted-light);
-  background: rgba(255, 255, 255, 0.7);
-}
-
-.empty-state i {
-  font-size: 3rem;
-  margin-bottom: 15px;
-  color: #666;
-  transition: color var(--transition-slow);
-}
-
-body.light-mode .empty-state i {
-  color: #aaa;
-}
-
-.empty-state h3 {
-  font-size: 1.4rem;
-  margin-bottom: 8px;
-  color: #999;
-  transition: color var(--transition-slow);
-}
-
-body.light-mode .empty-state h3 {
-  color: #888;
-}
-
-.empty-state p {
-  font-size: 1rem;
-  color: var(--text-muted-dark);
-  transition: color var(--transition-slow);
-}
-
-body.light-mode .empty-state p {
-  color: var(--text-muted-light);
-}
-
-/* ==================== 自动隐藏功能 ==================== */
-.main-content.hidden {
-  opacity: 0.1;
-  transition: opacity var(--transition-slow);
-}
-
-.sidebar.hidden,
-.content-area.hidden {
-  opacity: 0.1;
-  transition: opacity var(--transition-slow);
-  pointer-events: none;
-}
-
-/* 鼠标悬停时显示 */
-.main-content:hover .sidebar,
-.main-content:hover .content-area,
-.sidebar:hover,
-.content-area:hover {
-  opacity: 1 !important;
-  pointer-events: auto;
-}
-
-.main-content.hidden .sidebar,
-.main-content.hidden .content-area {
-  opacity: 0.1;
-  transition: opacity var(--transition-slow);
-  pointer-events: none;
-}
-
-/* ==================== 图片相关样式 ==================== */
-.image-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.image-item {
-  position: relative;
-  width: 150px;
-  height: 150px;
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  cursor: pointer;
-  transition: all var(--transition-fast);
-}
-
-.image-item:hover {
-  transform: scale(1.05);
-  box-shadow: var(--shadow-md);
-}
-
-.image-item img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform var(--transition-fast);
-}
-
-.image-item:hover img {
-  transform: scale(1.1);
-}
-
-.image-item-overlay {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  background: rgba(0, 0, 0, 0.7);
-  padding: 5px;
-  color: white;
-  font-size: 0.7rem;
-  text-align: center;
-  opacity: 0;
-  transition: opacity var(--transition-fast);
-}
-
-.image-item:hover .image-item-overlay {
-  opacity: 1;
-}
-
-/* 图片模态框预览区 */
-.image-preview-area {
-  margin-top: 15px;
-  padding: 15px;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: var(--radius-lg);
-  border: 1px dashed rgba(255, 255, 255, 0.2);
-  max-height: 200px;
-  overflow-y: auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-  gap: 10px;
-}
-
-body.light-mode .image-preview-area {
-  background: rgba(0, 0, 0, 0.05);
-  border: 1px dashed rgba(0, 0, 0, 0.2);
-}
-
-.preview-image-item {
-  position: relative;
-  width: 100px;
-  height: 100px;
-  border-radius: var(--radius-sm);
-  overflow: hidden;
-}
-
-.preview-image-item img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.remove-preview-btn {
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  background: rgba(255, 0, 0, 0.8);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  font-size: 0.7rem;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* ==================== 响应式设计调整 ==================== */
-
-/* 1200px及以下 */
-@media (max-width: 1200px) {
-  :root {
-    --nav-height: 48px;
+// 设置背景
+function setBackground(type, src, isLocalFile = false) {
+  if (!backgroundMedia || !backgroundVideo) {
+    console.error("背景媒体元素未找到");
+    return;
   }
 
-  .sidebar {
-    width: 130px;
-    min-width: 130px;
-    max-width: 170px;
-    top: var(--nav-height);
-    height: calc(100vh - var(--nav-height));
+  backgroundMedia.style.display = "none";
+  backgroundVideo.style.display = "none";
+  backgroundVideo.pause();
+
+  if (type === "none") {
+    currentBackground = { type: "none", src: "", isLocalFile: false };
+    if (isLightMode) {
+      document.body.style.background =
+        "linear-gradient(135deg, #e3f2fd, #bbdefb, #90caf9)";
+    } else {
+      document.body.style.background =
+        "linear-gradient(135deg, #0f0c29, #302b63, #24243e)";
+    }
+  } else if (type === "image") {
+    currentBackground = {
+      type: "image",
+      src: src,
+      isLocalFile: isLocalFile,
+    };
+
+    backgroundMedia.onload = function () {
+      if (backgroundMedia) {
+        backgroundMedia.style.display = "block";
+        backgroundMedia.style.opacity = (backgroundOpacity / 100).toFixed(2);
+        backgroundMedia.style.objectFit = "cover";
+        backgroundMedia.style.objectPosition = "center";
+      }
+    };
+    backgroundMedia.onerror = function () {
+      console.error("背景图片加载失败:", src);
+    };
+
+    backgroundMedia.src = src;
+    backgroundMedia.style.objectFit = "cover";
+    backgroundMedia.style.objectPosition = "center";
+  } else if (type === "video") {
+    currentBackground = {
+      type: "video",
+      src: src,
+      isLocalFile: isLocalFile,
+    };
+
+    backgroundVideo.onloadeddata = function () {
+      if (backgroundVideo) {
+        backgroundVideo.style.display = "block";
+        backgroundVideo.style.opacity = (backgroundOpacity / 100).toFixed(2);
+        backgroundVideo.style.objectFit = "cover";
+        backgroundVideo.style.objectPosition = "center";
+        backgroundVideo
+          .play()
+          .catch((e) => console.log("视频自动播放被阻止:", e));
+      }
+    };
+    backgroundVideo.onerror = function () {
+      console.error("背景视频加载失败:", src);
+    };
+
+    backgroundVideo.src = src;
+    backgroundVideo.style.objectFit = "cover";
+    backgroundVideo.style.objectPosition = "center";
+    backgroundVideo.load();
   }
 
-  .content-area {
-    min-width: calc(500px - 110px);
+  saveToLocalStorage();
+}
+
+// 预览上传的文件
+// 修改后的文件预览函数 - 支持视频/图片预览及自定义错误弹窗
+async function previewUploadedFile(file) {
+  const previewArea = uploadPreview;
+
+  // 1. 初始化预览区域
+  previewArea.innerHTML = "";
+
+  if (!file) {
+    previewArea.innerHTML = "<p>预览区域</p>";
+    return;
+  }
+
+  const fileType = file.type;
+  const isImage = fileType.startsWith("image/");
+  const isVideo = fileType.startsWith("video/");
+
+  // 2. 替代原来的 innerHTML 提示，改用自定义弹窗
+  if (!isImage && !isVideo) {
+    previewArea.innerHTML = "<p style='color: #ff6b35;'>不支持的文件格式</p>";
+    // 使用 await 确保用户看到并点击确认后，程序再继续或结束
+    await Modal.alert(
+      "当前仅支持图片（JPG, PNG, WebP）或视频（MP4）格式的文件。",
+      "格式不支持",
+    );
+    return;
+  }
+
+  // 3. 处理文件读取
+  const reader = new FileReader();
+
+  // 显示加载中状态
+  previewArea.innerHTML =
+    "<div class='loading-spinner'><i class='fas fa-spinner fa-spin'></i> 读取中...</div>";
+
+  reader.onload = function (e) {
+    previewArea.innerHTML = ""; // 清除加载状态
+
+    if (isImage) {
+      const img = document.createElement("img");
+      img.src = e.target.result;
+      img.style.maxWidth = "100%";
+      img.style.maxHeight = "300px"; // 限制预览高度
+      img.style.borderRadius = "8px";
+      img.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
+      previewArea.appendChild(img);
+    } else if (isVideo) {
+      const video = document.createElement("video");
+      video.src = e.target.result;
+      video.controls = true;
+      video.muted = true;
+      video.autoplay = true; // 预览时自动播放
+      video.style.maxWidth = "100%";
+      video.style.maxHeight = "300px";
+      video.style.borderRadius = "8px";
+      previewArea.appendChild(video);
+    }
+  };
+
+  reader.onerror = async function () {
+    previewArea.innerHTML = "<p>文件读取失败</p>";
+    await Modal.alert(
+      "无法读取该文件，请检查文件是否损坏或被占用。",
+      "读取错误",
+    );
+  };
+
+  reader.readAsDataURL(file);
+}
+
+// 预览自定义链接
+function previewCustomLink(url) {
+  const previewArea = customPreview;
+  previewArea.innerHTML = "";
+
+  if (!url) {
+    previewArea.innerHTML = "<p>预览区域</p>";
+    return;
+  }
+
+  if (url.match(/\.(jpg|jpeg|png|gif|webp|bmp)$/i)) {
+    const img = document.createElement("img");
+    img.src = url;
+    img.onerror = function () {
+      previewArea.innerHTML = "<p>图片加载失败</p>";
+    };
+    previewArea.appendChild(img);
+  } else if (url.match(/\.(mp4|webm|ogg)$/i)) {
+    const video = document.createElement("video");
+    video.src = url;
+    video.controls = true;
+    video.muted = true;
+    video.onerror = function () {
+      previewArea.innerHTML = "<p>视频加载失败</p>";
+    };
+    previewArea.appendChild(video);
+  } else {
+    previewArea.innerHTML = "<p>无法识别链接类型</p>";
   }
 }
 
-/* 1024px及以下 */
-@media (max-width: 1024px) {
-  :root {
-    --nav-height: 46px;
-  }
+// 初始化背景选择功能
+// 修改后的背景选择器初始化函数 - 完整版
+function initBackgroundSelector() {
+  backgroundSelectorBtn.addEventListener("click", () => {
+    document.querySelectorAll(".background-option").forEach((option) => {
+      option.classList.remove("selected");
+    });
 
-  .sidebar {
-    width: 130px;
-    min-width: 130px;
-    max-width: 150px;
-    top: var(--nav-height);
-    height: calc(100vh - var(--nav-height));
-  }
+    switchTab("background", "preset");
 
-  .content-area {
-    min-width: calc(500px - 160px);
+    const currentOption = document.querySelector(
+      `.background-option[data-type="${currentBackground.type}"]`,
+    );
+    if (currentOption && currentBackground.type !== "none") {
+      currentOption.classList.add("selected");
+    } else {
+      const noneOption = document.querySelector(
+        '.background-option[data-type="none"]',
+      );
+      if (noneOption) noneOption.classList.add("selected");
+    }
+
+    customBackgroundInput.value = "";
+    customPreview.innerHTML = "<p>预览区域</p>";
+    uploadPreview.innerHTML = "<p>预览区域</p>";
+    backgroundModal.classList.add("active");
+  });
+
+  backgroundTabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const tabId = tab.dataset.tab;
+      switchTab("background", tabId);
+    });
+  });
+
+  document.querySelectorAll(".background-option").forEach((option) => {
+    option.addEventListener("click", () => {
+      document.querySelectorAll(".background-option").forEach((opt) => {
+        opt.classList.remove("selected");
+      });
+      option.classList.add("selected");
+    });
+  });
+
+  fileUploadArea.addEventListener("click", () => {
+    backgroundFileInput.click();
+  });
+
+  // 文件拖放功能
+  fileUploadArea.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    fileUploadArea.style.borderColor = "#ff9900";
+    fileUploadArea.style.background = "rgba(255, 153, 0, 0.1)";
+  });
+
+  fileUploadArea.addEventListener("dragleave", () => {
+    fileUploadArea.style.borderColor = "rgba(255, 255, 255, 0.1)";
+    fileUploadArea.style.background = "rgba(255, 153, 0, 0.05)";
+  });
+
+  // 改为 async 处理拖放
+  fileUploadArea.addEventListener("drop", async (e) => {
+    e.preventDefault();
+    fileUploadArea.style.borderColor = "rgba(255, 255, 255, 0.1)";
+    fileUploadArea.style.background = "rgba(255, 153, 0, 0.05)";
+
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      const file = files[0];
+      if (file.type.startsWith("image/") || file.type.startsWith("video/")) {
+        // 使用 DataTransfer 确保 input.files 被正确填充
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        backgroundFileInput.files = dataTransfer.files;
+        previewUploadedFile(file);
+      } else {
+        await Modal.alert("请选择图片或视频文件作为背景。", "格式不支持");
+      }
+    }
+  });
+
+  backgroundFileInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      previewUploadedFile(file);
+    }
+  });
+
+  customBackgroundInput.addEventListener("input", () => {
+    const url = customBackgroundInput.value.trim();
+    if (url) {
+      previewCustomLink(url);
+    } else {
+      customPreview.innerHTML = "<p>预览区域</p>";
+    }
+  });
+
+  // 改为 async 处理背景应用逻辑
+  applyBackgroundBtn.addEventListener("click", async () => {
+    const activeTabEl = document.querySelector(".background-tab.active");
+    if (!activeTabEl) return;
+    const activeTab = activeTabEl.dataset.tab;
+
+    if (activeTab === "preset") {
+      const selectedOption = document.querySelector(
+        ".background-option.selected",
+      );
+      if (selectedOption) {
+        const type = selectedOption.dataset.type;
+        const src = selectedOption.dataset.src || "";
+        setBackground(type, src, false);
+        backgroundModal.classList.remove("active");
+      }
+    } else if (activeTab === "upload") {
+      const file = backgroundFileInput.files[0];
+      if (!file) {
+        await Modal.alert("请先上传一个图片或视频文件。", "未选择文件");
+        return;
+      }
+
+      const fileType = file.type;
+      const isImage = fileType.startsWith("image/");
+      const isVideo = fileType.startsWith("video/");
+
+      if (!isImage && !isVideo) {
+        await Modal.alert("不支持的文件格式，请选择图片或视频。", "格式错误");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        const type = isImage ? "image" : "video";
+        setBackground(type, e.target.result, true);
+        backgroundModal.classList.remove("active");
+      };
+      reader.readAsDataURL(file);
+    } else if (activeTab === "custom") {
+      const url = customBackgroundInput.value.trim();
+      if (!url) {
+        await Modal.alert("请输入有效的图片或视频链接地址。", "输入为空");
+        return;
+      }
+
+      if (url.match(/\.(jpg|jpeg|png|gif|webp|bmp|mp4|webm|ogg)$/i)) {
+        const type = url.match(/\.(mp4|webm|ogg)$/i) ? "video" : "image";
+        setBackground(type, url, false);
+        backgroundModal.classList.remove("active");
+      } else {
+        await Modal.alert(
+          "请输入有效的链接，支持常见格式：\njpg, png, gif, webp, mp4, webm",
+          "链接无效",
+        );
+      }
+    }
+  });
+
+  cancelBackgroundBtn.addEventListener("click", () => {
+    backgroundModal.classList.remove("active");
+  });
+
+  closeBackgroundModal.addEventListener("click", () => {
+    backgroundModal.classList.remove("active");
+  });
+
+  backgroundModal.addEventListener("click", (e) => {
+    if (e.target === backgroundModal) {
+      backgroundModal.classList.remove("active");
+    }
+  });
+}
+
+// 初始化透明度控制功能
+function initOpacityControl() {
+  opacityControlBtn.addEventListener("click", () => {
+    opacitySlider.value = backgroundOpacity;
+    opacityValue.textContent = `${backgroundOpacity}%`;
+    opacityModal.classList.add("active");
+  });
+
+  opacitySlider.addEventListener("input", function () {
+    const value = this.value;
+    opacityValue.textContent = `${value}%`;
+  });
+
+  opacityPresetBtns.forEach((btn) => {
+    btn.addEventListener("click", function () {
+      const value = this.getAttribute("data-value");
+      opacitySlider.value = value;
+      opacityValue.textContent = `${value}%`;
+    });
+  });
+
+  applyOpacityBtn.addEventListener("click", () => {
+    const newOpacity = parseInt(opacitySlider.value);
+    setOpacity(newOpacity, newOpacity);
+    saveAutoHideSettings();
+    opacityModal.classList.remove("active");
+  });
+
+  cancelOpacityBtn.addEventListener("click", () => {
+    opacityModal.classList.remove("active");
+  });
+
+  closeOpacityModal.addEventListener("click", () => {
+    opacityModal.classList.remove("active");
+  });
+
+  opacityModal.addEventListener("click", (e) => {
+    if (e.target === opacityModal) {
+      opacityModal.classList.remove("active");
+    }
+  });
+}
+
+// 切换标签页
+function switchTab(modalType, tabId) {
+  if (modalType === "background") {
+    document.querySelectorAll(".background-tab").forEach((tab) => {
+      tab.classList.remove("active");
+    });
+    document.querySelectorAll(".background-tab-content").forEach((content) => {
+      content.classList.remove("active");
+    });
+
+    document
+      .querySelector(`.background-tab[data-tab="${tabId}"]`)
+      .classList.add("active");
+    document.getElementById(`${tabId}-tab`).classList.add("active");
+  } else if (modalType === "import-export") {
+    document.querySelectorAll(".import-export-tab").forEach((tab) => {
+      tab.classList.remove("active");
+    });
+    document
+      .querySelectorAll(".import-export-tab-content")
+      .forEach((content) => {
+        content.classList.remove("active");
+      });
+
+    document
+      .querySelector(`.import-export-tab[data-tab="${tabId}"]`)
+      .classList.add("active");
+    document.getElementById(`${tabId}-tab`).classList.add("active");
+
+    currentImportExportTab = tabId;
+
+    if (tabId === "export") {
+      exportActionBtn.textContent = "导出数据";
+      exportActionBtn.style.display = "block";
+      importActionBtn.style.display = "none";
+    } else {
+      exportActionBtn.style.display = "none";
+      importActionBtn.textContent = "导入数据";
+      importActionBtn.style.display = "block";
+    }
   }
 }
 
-/* 900px及以下 */
-@media (max-width: 900px) {
-  :root {
-    --nav-height: 44px;
-  }
+// 初始化导入导出功能
+// 修改后的导入导出初始化函数 - 完整版
+function initImportExport() {
+  exportBtn.addEventListener("click", () => {
+    switchTab("import-export", "export");
+    updateExportPreview();
+    importExportModal.classList.add("active");
+  });
 
-  .sidebar {
-    width: 100px;
-    min-width: 100px;
-    max-width: 130px;
-    top: var(--nav-height);
-    height: calc(100vh - var(--nav-height));
-  }
+  importBtn.addEventListener("click", () => {
+    switchTab("import-export", "import");
+    importPreview.innerHTML = "<p>导入文件预览区域</p>";
+    importExportModal.classList.add("active");
+  });
 
-  .content-area {
-    min-width: calc(500px - 150px);
+  importExportTabs.forEach((tab) => {
+    tab.addEventListener("click", () => {
+      const tabId = tab.dataset.tab;
+      switchTab("import-export", tabId);
+    });
+  });
+
+  exportActionBtn.addEventListener("click", exportData);
+  importActionBtn.addEventListener("click", importData);
+
+  cancelImportExportBtn.addEventListener("click", () => {
+    importExportModal.classList.remove("active");
+  });
+
+  closeImportExportModal.addEventListener("click", () => {
+    importExportModal.classList.remove("active");
+  });
+
+  importFileArea.addEventListener("click", () => {
+    importFileInput.click();
+  });
+
+  // 文件拖放功能
+  importFileArea.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    importFileArea.style.borderColor = "#ff3366";
+    importFileArea.style.background = "rgba(255, 51, 102, 0.1)";
+  });
+
+  importFileArea.addEventListener("dragleave", () => {
+    importFileArea.style.borderColor = "rgba(255, 255, 255, 0.1)";
+    importFileArea.style.background = "rgba(255, 51, 102, 0.05)";
+  });
+
+  // 改为 async 以支持自定义弹窗
+  importFileArea.addEventListener("drop", async (e) => {
+    e.preventDefault();
+    importFileArea.style.borderColor = "rgba(255, 255, 255, 0.1)";
+    importFileArea.style.background = "rgba(255, 51, 102, 0.05)";
+
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      const file = files[0];
+      const fileName = file.name.toLowerCase();
+
+      // 检查是否为 JSON 或 TXT 文件
+      if (fileName.endsWith(".json") || fileName.endsWith(".txt")) {
+        // 使用 DataTransfer 规范化赋值
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        importFileInput.files = dataTransfer.files;
+
+        previewImportFile(file);
+      } else {
+        // 替换原来的 alert
+        await Modal.alert(
+          "请选择有效的 JSON 或 TXT 格式文件进行导入。",
+          "不支持的文件格式",
+        );
+      }
+    }
+  });
+
+  importFileInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      previewImportFile(file);
+    }
+  });
+
+  importExportModal.addEventListener("click", (e) => {
+    if (e.target === importExportModal) {
+      importExportModal.classList.remove("active");
+    }
+  });
+}
+// 更新导出数据预览
+function updateExportPreview() {
+  const exportFormat = document.querySelector(
+    'input[name="exportFormat"]:checked',
+  ).value;
+
+  if (exportFormat === "json") {
+    const data = {
+      contentItems: contentItems,
+      nextItemId: nextItemId,
+      nextContentItemId: nextContentItemId,
+      currentBackground: currentBackground,
+      backgroundOpacity: backgroundOpacity,
+      overlayOpacity: overlayOpacity,
+      isLightMode: isLightMode,
+      exportTime: new Date().toISOString(),
+      version: "1.0",
+    };
+
+    exportDataPreview.textContent = JSON.stringify(data, null, 2);
+  } else {
+    let text = "";
+    contentItems.forEach((item) => {
+      if (item.type === "main-title") {
+        text += `【大标题】${item.text}\n\n`;
+      } else if (item.type === "subtitle") {
+        text += `【小标题】${item.text}\n\n`;
+      } else if (item.type === "content-card") {
+        text += `【内容卡片】\n`;
+        if (item.content && item.content.length > 0) {
+          item.content.forEach((contentItem) => {
+            text += `  • ${contentItem.text}\n`;
+          });
+        }
+        text += "\n";
+      }
+    });
+
+    exportDataPreview.textContent = text;
   }
 }
 
-/* 768px及以下 */
-@media (max-width: 768px) {
-  :root {
-    --nav-height: 42px;
+// 导出数据
+function exportData() {
+  const exportFormat = document.querySelector(
+    'input[name="exportFormat"]:checked',
+  ).value;
+
+  if (exportFormat === "json") {
+    const data = {
+      contentItems: contentItems,
+      nextItemId: nextItemId,
+      nextContentItemId: nextContentItemId,
+      currentBackground: currentBackground,
+      backgroundOpacity: backgroundOpacity,
+      overlayOpacity: overlayOpacity,
+      isLightMode: isLightMode,
+      exportTime: new Date().toISOString(),
+      version: "1.0",
+    };
+
+    const dataStr = JSON.stringify(data, null, 2);
+    const dataBlob = new Blob([dataStr], { type: "application/json" });
+    const url = URL.createObjectURL(dataBlob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `内容系统备份_${new Date().toISOString().slice(0, 10)}.json`;
+
+    document.body.appendChild(a);
+    a.click();
+
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 100);
+
+    showCopyNotification();
+    copyNotification.querySelector("span").textContent = "数据导出成功！";
+  } else {
+    let text = "";
+    contentItems.forEach((item) => {
+      if (item.type === "main-title") {
+        text += `【大标题】${item.text}\n\n`;
+      } else if (item.type === "subtitle") {
+        text += `【小标题】${item.text}\n\n`;
+      } else if (item.type === "content-card") {
+        text += `【内容卡片】\n`;
+        if (item.content && item.content.length > 0) {
+          item.content.forEach((contentItem) => {
+            text += `  • ${contentItem.text}\n`;
+          });
+        }
+        text += "\n";
+      }
+    });
+
+    const dataBlob = new Blob([text], {
+      type: "text/plain;charset=utf-8",
+    });
+    const url = URL.createObjectURL(dataBlob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `内容系统备份_${new Date().toISOString().slice(0, 10)}.txt`;
+
+    document.body.appendChild(a);
+    a.click();
+
+    setTimeout(() => {
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 100);
+
+    showCopyNotification();
+    copyNotification.querySelector("span").textContent = "数据导出成功！";
   }
 
-  .sidebar {
-    width: 90px;
-    min-width: 140px;
-    max-width: 140px;
-    top: var(--nav-height);
-    height: calc(100vh - var(--nav-height));
+  setTimeout(() => {
+    importExportModal.classList.remove("active");
+  }, 500);
+}
+
+// 预览导入文件
+// 预览导入文件
+function previewImportFile(file) {
+  const previewArea = importPreview;
+  previewArea.innerHTML = "";
+
+  if (!file) {
+    previewArea.innerHTML = "<p>预览区域</p>";
+    return;
   }
 
-  .content-area {
-    min-width: calc(500px - 140px);
-    padding: 12px;
+  // 清除之前的数据
+  previewArea.dataset.parsedData = "";
+
+  const reader = new FileReader();
+  reader.onload = function (e) {
+    try {
+      // 根据文件类型处理
+      if (file.name.toLowerCase().endsWith(".json")) {
+        // JSON文件处理
+        const data = JSON.parse(e.target.result);
+
+        if (!data.contentItems || !Array.isArray(data.contentItems)) {
+          throw new Error("无效的JSON数据格式");
+        }
+
+        let previewText = "=== JSON文件预览 ===\n\n";
+        data.contentItems.forEach((item) => {
+          if (item.type === "main-title") {
+            previewText += `• [大标题] ${item.text}\n`;
+          } else if (item.type === "subtitle") {
+            previewText += `  [小标题] ${item.text}\n`;
+          } else if (item.type === "content-card") {
+            previewText += `  [内容卡片] ${item.content?.length || 0} 条内容\n`;
+          } else if (item.type === "image-card") {
+            previewText += `  [图片卡片] ${item.images?.length || 0} 张图片\n`;
+          }
+        });
+
+        previewText += `\n总计: ${data.contentItems.length} 个项目`;
+        previewArea.textContent = previewText;
+
+        // 保存数据用于导入
+        previewArea.dataset.parsedData = JSON.stringify(data);
+      } else if (
+        file.name.toLowerCase().endsWith(".txt") ||
+        file.name.toLowerCase().endsWith(".text")
+      ) {
+        // TXT文件处理
+        const txtContent = e.target.result;
+
+        // 使用新的解析器
+        if (typeof parseTxtContent !== "undefined") {
+          // 解析内容
+          const parsedItems = parseTxtContent(txtContent);
+
+          // 生成预览
+          let previewText = "=== TXT文件智能解析 ===\n\n";
+
+          // 解析规则说明
+          previewText += "【解析规则】\n";
+          previewText += "• ### 或 h3 → 大标题（生成左侧导航）\n";
+          previewText += "• #### 或 h4/h5 → 小标题\n";
+          previewText += "• ./path/image.jpg → 图片卡片\n";
+          previewText += "• 连续文本（无空行）→ 同一卡片\n";
+          previewText += "• 空行分隔 → 新卡片开始\n\n";
+
+          // 统计信息
+          const titles = parsedItems.filter(
+            (item) => item.type === "main-title",
+          ).length;
+          const subtitles = parsedItems.filter(
+            (item) => item.type === "subtitle",
+          ).length;
+          const images = parsedItems.filter(
+            (item) => item.type === "image-card",
+          ).length;
+          const contentCards = parsedItems.filter(
+            (item) => item.type === "content-card",
+          ).length;
+
+          previewText += "【统计信息】\n";
+          previewText += `大标题: ${titles} 个\n`;
+          previewText += `小标题: ${subtitles} 个\n`;
+          previewText += `图片卡片: ${images} 个\n`;
+          previewText += `内容卡片: ${contentCards} 个\n`;
+          previewText += `总计项目: ${parsedItems.length} 个\n\n`;
+
+          // 显示目录
+          if (titles > 0) {
+            previewText += "【目录结构】\n";
+            parsedItems
+              .filter((item) => item.type === "main-title")
+              .forEach((item, index) => {
+                previewText += `${index + 1}. ${item.text}\n`;
+              });
+            previewText += "\n";
+          }
+
+          // 显示内容示例
+          if (parsedItems.length > 0) {
+            previewText += "【内容示例】\n";
+            const sampleCount = Math.min(3, parsedItems.length);
+            for (let i = 0; i < sampleCount; i++) {
+              const item = parsedItems[i];
+              previewText += `${i + 1}. [${item.type}] `;
+
+              if (item.type === "main-title") {
+                previewText += `"${item.text}"\n`;
+              } else if (item.type === "subtitle") {
+                previewText += `"${item.text}"\n`;
+              } else if (item.type === "content-card") {
+                previewText += `包含 ${item.content?.length || 0} 条内容\n`;
+                if (item.content && item.content.length > 0) {
+                  previewText += `  示例: "${item.content[0].text.substring(0, 50)}${item.content[0].text.length > 50 ? "..." : ""}"\n`;
+                }
+              } else if (item.type === "image-card") {
+                previewText += `图片: ${item.images?.[0]?.filename || "未命名"}\n`;
+              }
+            }
+
+            if (parsedItems.length > sampleCount) {
+              previewText += `... 还有 ${parsedItems.length - sampleCount} 个项目\n`;
+            }
+          }
+
+          previewArea.textContent = previewText;
+
+          // 保存解析数据
+          previewArea.dataset.parsedData = JSON.stringify({
+            contentItems: parsedItems,
+            parsedFromTxt: true,
+            originalFileType: "txt",
+          });
+        } else {
+          // 基本TXT预览
+          const lines = txtContent
+            .split("\n")
+            .filter((line) => line.trim().length > 0);
+          previewArea.textContent = `TXT文件检测到 ${lines.length} 行非空文本\n\n请确保已加载智能解析功能`;
+        }
+      } else {
+        previewArea.innerHTML = `<p style="color: #ff6666;">不支持的文件格式，请选择JSON或TXT文件</p>`;
+      }
+    } catch (error) {
+      console.error("文件预览失败:", error);
+      previewArea.innerHTML = `<p style="color: #ff6666;">文件解析失败: ${error.message}</p>`;
+    }
+  };
+
+  reader.onerror = function () {
+    previewArea.innerHTML = `<p style="color: #ff6666;">文件读取失败</p>`;
+  };
+
+  reader.readAsText(file, "UTF-8");
+}
+
+// 导入数据
+// ============ 完整导入功能（集成自定义弹窗与 ID 同步） ============
+async function importData() {
+  const file = importFileInput.files[0];
+
+  // 1. 检查文件选择
+  if (!file) {
+    await Modal.alert("请先选择一个文件后再进行导入操作。", "提示");
+    return;
+  }
+
+  const previewArea = importPreview;
+  const parsedData = previewArea.dataset.parsedData;
+
+  // 2. 检查预览数据
+  if (!parsedData) {
+    await Modal.alert("请先点击预览按钮确认文件内容是否正确。", "预览缺失");
+    return;
+  }
+
+  try {
+    const data = JSON.parse(parsedData);
+
+    // 检查是否从 TXT 解析而来
+    const isFromTxt = data.parsedFromTxt || false;
+    const itemsToImport = data.contentItems || data;
+
+    // 3. 检查数据有效性
+    if (!Array.isArray(itemsToImport) || itemsToImport.length === 0) {
+      await Modal.alert(
+        "该文件中没有找到任何有效的内容项，请检查文件格式。",
+        "导入失败",
+      );
+      return;
+    }
+
+    // 构建确认消息（统计信息）
+    let confirmMessage = `确定要导入 ${itemsToImport.length} 个内容项吗？`;
+
+    if (isFromTxt) {
+      const titles = itemsToImport.filter(
+        (item) => item.type === "main-title",
+      ).length;
+      const subtitles = itemsToImport.filter(
+        (item) => item.type === "subtitle",
+      ).length;
+      const images = itemsToImport.filter(
+        (item) => item.type === "image-card",
+      ).length;
+      const contentCards = itemsToImport.filter(
+        (item) => item.type === "content-card",
+      ).length;
+
+      confirmMessage = `确定要导入 ${itemsToImport.length} 个内容项吗？\n\nTXT解析结果：\n• ${titles} 个大标题\n• ${subtitles} 个小标题\n• ${images} 组图片卡\n• ${contentCards} 个内容卡片`;
+    }
+
+    // 4. 确认导入操作
+    const fullConfirmMessage =
+      confirmMessage + "\n\n注意：导入操作将替换当前页面上的所有内容！";
+    const isConfirmed = await Modal.confirm(fullConfirmMessage, "确认导入");
+
+    if (!isConfirmed) return;
+
+    // --- 开始执行数据覆盖逻辑 ---
+
+    // 清空现有内容
+    contentItems = [];
+
+    if (isFromTxt) {
+      // --- 情况 A: TXT 解析的数据导入 ---
+      contentItems = itemsToImport;
+
+      // 自动更新全局 ID 计数器，防止后续新增内容时 ID 冲突
+      // 更新主项目 ID
+      if (itemsToImport.length > 0) {
+        const maxId = Math.max(...itemsToImport.map((item) => item.id || 0));
+        nextItemId = Math.max(nextItemId, maxId + 1);
+      }
+
+      // 更新子内容项 ID (Content Card 内部项)
+      const allSubItems = itemsToImport
+        .filter((item) => item.type === "content-card")
+        .flatMap((item) => item.content || []);
+      if (allSubItems.length > 0) {
+        const maxSubId = Math.max(...allSubItems.map((item) => item.id || 0));
+        nextContentItemId = Math.max(nextContentItemId, maxSubId + 1);
+      }
+
+      // 更新图片 ID
+      const allImages = itemsToImport
+        .filter((item) => item.type === "image-card")
+        .flatMap((item) => item.images || []);
+      if (allImages.length > 0) {
+        const maxImgId = Math.max(...allImages.map((img) => img.id || 0));
+        nextImageId = Math.max(nextImageId, maxImgId + 1);
+      }
+    } else {
+      // --- 情况 B: 标准 JSON 数据导入 ---
+      contentItems = data.contentItems || [];
+      nextItemId = data.nextItemId || nextItemId;
+      nextContentItemId = data.nextContentItemId || nextContentItemId;
+      if (data.nextImageId) nextImageId = data.nextImageId;
+
+      // 恢复背景设置
+      if (data.currentBackground) {
+        currentBackground = data.currentBackground;
+        setBackground(
+          currentBackground.type,
+          currentBackground.src,
+          currentBackground.isLocalFile || false,
+        );
+      }
+
+      // 恢复透明度设置
+      if (data.backgroundOpacity) {
+        setOpacity(
+          data.backgroundOpacity,
+          data.overlayOpacity || data.backgroundOpacity,
+        );
+      }
+
+      // 恢复主题模式
+      if (typeof data.isLightMode !== "undefined") {
+        setTheme(data.isLightMode);
+      }
+    }
+
+    // 5. 持久化与刷新页面
+    initPage();
+    saveToLocalStorage();
+
+    // 6. 成功反馈
+    showCopyNotification();
+    const notifySpan = document.querySelector("#copyNotification span");
+    if (notifySpan) {
+      notifySpan.textContent = `成功导入 ${itemsToImport.length} 个内容项！`;
+    }
+
+    // 7. 关闭导入弹窗
+    if (typeof importExportModal !== "undefined") {
+      setTimeout(() => {
+        importExportModal.classList.remove("active");
+      }, 500);
+    }
+  } catch (error) {
+    console.error("Import Error:", error);
+    await Modal.alert(`导入过程中发生错误: ${error.message}`, "错误");
   }
 }
 
-/* 640px及以下 */
-@media (max-width: 640px) {
-  :root {
-    --nav-height: 40px;
+// 自动隐藏功能
+function initAutoHideSettings() {
+  autoHideTimeInput.value = autoHideTime;
+  enableAutoHide.checked = autoHideEnabled;
+
+  if (autoHideEnabled) {
+    startAutoHideTimer();
+  } else {
+    stopAutoHideTimer();
+    showAllElements();
   }
 
-  .sidebar {
-    width: 90px;
-    min-width: 130px;
-    max-width: 130px;
-    top: var(--nav-height);
-    height: calc(100vh - var(--nav-height));
-    padding: 10px 6px;
+  setupAutoHideListeners();
+}
+
+function setupAutoHideListeners() {
+  if (autoHideTimeInput) {
+    autoHideTimeInput.addEventListener("input", function () {
+      const value = parseInt(this.value);
+      if (value < 5) this.value = 5;
+      if (value > 300) this.value = 300;
+    });
+
+    autoHideTimeInput.addEventListener("change", saveAutoHideSettings);
   }
 
-  .content-area {
-    min-width: calc(500px - 130px);
-    padding: 10px;
-  }
-
-  .nav-item {
-    padding: 6px 8px;
-  }
-
-  .nav-item-title {
-    font-size: 0.75rem;
+  if (enableAutoHide) {
+    enableAutoHide.addEventListener("change", saveAutoHideSettings);
   }
 }
 
-/* 560px及以下 */
-@media (max-width: 560px) {
-  :root {
-    --nav-height: 38px;
-  }
+function startAutoHideTimer() {
+  stopAutoHideTimer();
 
-  .sidebar {
-    width: 120px;
-    min-width: 120px;
-    max-width: 120px;
-    top: var(--nav-height);
-    height: calc(100vh - var(--nav-height));
-    padding: 8px 5px;
-  }
-
-  .content-area {
-    min-width: calc(500px - 120px);
-    padding: 8px;
-  }
-
-  .nav-item-title {
-    font-size: 0.7rem;
+  if (autoHideEnabled && autoHideTime > 0) {
+    hideTimeout = setTimeout(() => {
+      if (!mouseInWindow) {
+        hideContentElements();
+      }
+    }, autoHideTime * 1000);
   }
 }
 
-/* 窗口高度适配 */
-@media (max-height: 600px) {
-  .sidebar {
-    height: calc(100vh - var(--nav-height));
-    overflow-y: auto;
-  }
-
-  .content-area {
-    height: calc(100vh - var(--nav-height));
+function stopAutoHideTimer() {
+  if (hideTimeout) {
+    clearTimeout(hideTimeout);
+    hideTimeout = null;
   }
 }
 
-/* 自动隐藏功能的调整 */
-.sidebar.hidden,
-.content-area.hidden {
-  opacity: 0.1;
-  transition: opacity var(--transition-slow);
-  pointer-events: none;
+function hideContentElements() {
+  const sidebar = document.querySelector(".sidebar");
+  const contentArea = document.querySelector(".content-area");
+  const mainContent = document.querySelector(".main-content");
+
+  if (sidebar) sidebar.classList.add("hidden");
+  if (contentArea) contentArea.classList.add("hidden");
+  if (mainContent) mainContent.classList.add("hidden");
 }
 
-.main-content.hidden .sidebar,
-.main-content.hidden .content-area {
-  opacity: 0.1;
-  transition: opacity var(--transition-slow);
-  pointer-events: none;
+function showAllElements() {
+  const sidebar = document.querySelector(".sidebar");
+  const contentArea = document.querySelector(".content-area");
+  const mainContent = document.querySelector(".main-content");
+
+  if (sidebar) sidebar.classList.remove("hidden");
+  if (contentArea) contentArea.classList.remove("hidden");
+  if (mainContent) mainContent.classList.remove("hidden");
 }
 
-/* 鼠标悬停时显示 */
-.sidebar:hover,
-.content-area:hover,
-.main-content:hover .sidebar,
-.main-content:hover .content-area {
-  opacity: 1 !important;
-  pointer-events: auto;
-}
-
-/* ==================== 响应式布局调整 ==================== */
-/* 1200px及以上 - 大屏幕居中对齐布局 */
-@media (min-width: 1401px) {
-  .main-content {
-    justify-content: center;
-    position: relative;
-    left: auto;
-    right: auto;
-  }
-
-  .sidebar {
-    position: sticky;
-    top: var(--nav-height);
-    left: 0;
-  }
-
-  .content-area {
-    max-width: var(--content-max-width);
+function resetAutoHideTimer() {
+  if (autoHideEnabled) {
+    showAllElements();
+    startAutoHideTimer();
   }
 }
 
-/* 1200px及以下 - sidebar在左侧，内容自适应 */
-@media (min-width: 500px) and (max-width: 1400px) {
-  .main-content {
-    justify-content: flex-start;
-    width: 100%;
-    position: relative;
+function saveAutoHideSettings() {
+  autoHideTime = parseInt(autoHideTimeInput.value) || 20;
+  autoHideEnabled = enableAutoHide.checked;
+
+  if (autoHideTime < 5) autoHideTime = 5;
+  if (autoHideTime > 300) autoHideTime = 300;
+  autoHideTimeInput.value = autoHideTime;
+
+  if (autoHideEnabled) {
+    startAutoHideTimer();
+  } else {
+    stopAutoHideTimer();
+    showAllElements();
   }
 
-  .sidebar {
-    position: sticky;
-    left: 0;
-    top: var(--nav-height);
-    z-index: 100;
-  }
+  saveToLocalStorage();
+}
 
-  .content-area {
-    max-width: none;
-    flex: 1;
-    overflow-x: hidden;
+// 事件监听
+addMainTitleBtn.addEventListener("click", () => openAddModal("main-title"));
+addSubtitleBtn.addEventListener("click", () => openAddModal("subtitle"));
+addContentBtn.addEventListener("click", () => openAddModal("content-card"));
+themeToggleBtn.addEventListener("click", toggleTheme);
+
+closeModal.addEventListener("click", () => {
+  modalOverlay.classList.remove("active");
+  currentEditItemId = null;
+  currentEditCardItemId = null;
+  currentContentCardId = null;
+  currentInsertAfterId = null;
+  currentItemType = "";
+});
+
+addMoreBtn.addEventListener("click", addNewTextarea);
+contentForm.addEventListener("submit", saveContentItem);
+
+modalOverlay.addEventListener("click", (e) => {
+  if (e.target === modalOverlay) {
+    modalOverlay.classList.remove("active");
+    currentEditItemId = null;
+    currentEditCardItemId = null;
+    currentContentCardId = null;
+    currentInsertAfterId = null;
+    currentItemType = "";
+  }
+});
+
+// 右键菜单功能
+editContextItem.addEventListener("click", () => {
+  openEditModal();
+  contextMenu.classList.remove("active");
+});
+
+insertAfterContextItem.addEventListener("click", () => {
+  openInsertAfterModal();
+  contextMenu.classList.remove("active");
+});
+
+insertMainTitleAfterItem.addEventListener("click", () => {
+  openInsertMainTitleAfterModal();
+  contextMenu.classList.remove("active");
+});
+
+insertSubtitleAfterItem.addEventListener("click", () => {
+  openInsertSubtitleAfterModal();
+  contextMenu.classList.remove("active");
+});
+
+addContextItem.addEventListener("click", () => {
+  if (contextMenuTarget && contextMenuTarget.type === "content-card") {
+    currentItemType = "content-card";
+    currentEditItemId = contextMenuTarget.id;
+    openEditModal();
+  } else {
+    let type = "main-title";
+    if (contextMenuTarget) {
+      if (contextMenuTarget.type === "main-title") {
+        type = "main-title";
+      } else if (contextMenuTarget.type === "subtitle") {
+        type = "subtitle";
+      } else if (contextMenuTarget.type === "content-card") {
+        type = "content-card";
+      }
+    }
+    openAddModal(type);
+  }
+  contextMenu.classList.remove("active");
+});
+
+deleteContextItem.addEventListener("click", () => {
+  deleteContentItem();
+  contextMenu.classList.remove("active");
+});
+
+// 全局事件
+document.addEventListener("click", () => {
+  contextMenu.classList.remove("active");
+  contextMenuTarget = null;
+});
+
+document.addEventListener("contextmenu", (e) => {
+  if (
+    e.target.closest(".content-item") ||
+    e.target.closest(".main-title") ||
+    e.target.closest(".subtitle") ||
+    e.target.closest(".content-card")
+  ) {
+    e.preventDefault();
+  }
+});
+
+// 自动隐藏事件
+document.addEventListener("mousemove", () => {
+  mouseInWindow = true;
+  resetAutoHideTimer();
+});
+
+document.addEventListener("mouseenter", () => {
+  mouseInWindow = true;
+  resetAutoHideTimer();
+});
+
+document.addEventListener("mouseleave", (e) => {
+  if (
+    e.clientY <= 0 ||
+    e.clientX <= 0 ||
+    e.clientX >= window.innerWidth ||
+    e.clientY >= window.innerHeight
+  ) {
+    mouseInWindow = false;
+    resetAutoHideTimer();
+  }
+});
+
+document.addEventListener("keydown", resetAutoHideTimer);
+document.addEventListener("click", resetAutoHideTimer);
+
+window.addEventListener("resize", () => {});
+window.addEventListener("beforeunload", saveToLocalStorage);
+
+// ============ 全局自定义弹窗管理器 ============
+/**
+ * 全局自定义弹窗对象
+ * 支持 Promise 异步调用：await Modal.confirm("内容")
+ */
+const Modal = {
+  // 核心显示逻辑
+  show: function ({
+    title = "提示",
+    message = "",
+    type = "confirm", // 'confirm' 或 'alert'
+    onConfirm = null,
+  }) {
+    let overlay = document.getElementById("globalCustomModal");
+
+    // 1. 如果不存在则创建结构
+    if (!overlay) {
+      overlay = document.createElement("div");
+      overlay.id = "globalCustomModal";
+      overlay.className = "custom-modal-overlay";
+      overlay.innerHTML = `
+        <div class="custom-modal-content">
+          <div class="custom-modal-icon"></div>
+          <div class="custom-modal-title"></div>
+          <div class="custom-modal-message"></div>
+          <div class="custom-modal-actions">
+            <button class="modal-btn cancel-btn">取消</button>
+            <button class="modal-btn confirm-btn">确定</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+    }
+
+    const iconEl = overlay.querySelector(".custom-modal-icon");
+    const titleEl = overlay.querySelector(".custom-modal-title");
+    const msgEl = overlay.querySelector(".custom-modal-message");
+    const confirmBtn = overlay.querySelector(".confirm-btn");
+    const cancelBtn = overlay.querySelector(".cancel-btn");
+
+    // 2. 根据类型动态设置内容和外观
+    overlay.className = `custom-modal-overlay modal-type-${type}`;
+    titleEl.textContent = title;
+    msgEl.textContent = message;
+
+    // 设置图标：alert 用感叹号，confirm 用问号
+    iconEl.innerHTML =
+      type === "alert"
+        ? '<i class="fas fa-exclamation-circle"></i>'
+        : '<i class="fas fa-question-circle"></i>';
+
+    // 激活显示（触发 CSS 动画）
+    requestAnimationFrame(() => {
+      overlay.classList.add("active");
+    });
+
+    // 3. 事件处理：使用 Promise 封装
+    return new Promise((resolve) => {
+      // 封装关闭逻辑（带动画延迟）
+      const close = (result) => {
+        overlay.classList.remove("active");
+        // 等待 CSS 中的 0.3s/0.4s 动画结束后再彻底 resolve
+        setTimeout(() => {
+          if (result && onConfirm) onConfirm();
+          resolve(result);
+        }, 300);
+      };
+
+      // 绑定点击事件
+      confirmBtn.onclick = (e) => {
+        e.stopPropagation();
+        close(true);
+      };
+
+      cancelBtn.onclick = (e) => {
+        e.stopPropagation();
+        close(false);
+      };
+
+      // 点击遮罩层背景关闭（等同于取消）
+      overlay.onclick = (e) => {
+        if (e.target === overlay) close(false);
+      };
+    });
+  },
+
+  /**
+   * 替代系统自带的 alert
+   * @param {string} message 提示消息
+   * @param {string} title 标题
+   */
+  alert: function (message, title = "提醒") {
+    // 以后都只给我一条最推荐的翻译：使用 await 方式调用
+    return this.show({ title, message, type: "alert" });
+  },
+
+  /**
+   * 替代系统自带的 confirm
+   * @param {string} message 询问消息
+   * @param {string} title 标题
+   */
+  confirm: function (message, title = "确认操作") {
+    return this.show({ title, message, type: "confirm" });
+  },
+};
+
+// 主初始化函数
+function initializeApp() {
+  initBackgroundSelector();
+  initOpacityControl();
+  initImportExport();
+  initPage();
+  initAutoHideSettings();
+  initImageFunctions();
+
+  // 初始化TXT导入功能（如果存在）
+  if (typeof initTxtImportFunctions === "function") {
+    initTxtImportFunctions();
   }
 }
 
-@media (max-width: 499px) {
-  body {
-    min-width: 100%;
-    overflow-x: auto;
-  }
+// 页面加载完成后初始化
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", function () {
+    console.log("DOM已加载完成，开始初始化应用...");
+    initializeApp();
 
-  .main-content {
-    flex-direction: row;
-    min-width: var(--container-min-width);
-  }
-
-  .sidebar {
-    position: sticky;
-    left: 0;
-    top: var(--nav-height);
-  }
-
-  .content-area {
-    min-width: calc(var(--container-min-width) - var(--sidebar-width));
-  }
+    const editImagesItem = document.getElementById("editImagesItem");
+    if (editImagesItem) {
+      editImagesItem.addEventListener("click", () => {
+        if (contextMenuTarget && contextMenuTarget.type === "image-card") {
+          // 调用图片编辑功能
+          if (typeof openEditImageModal === "function") {
+            openEditImageModal();
+          }
+        }
+        contextMenu.classList.remove("active");
+      });
+    }
+  });
+} else {
+  console.log("文档已经加载完成，立即初始化...");
+  initializeApp();
 }
