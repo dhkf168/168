@@ -645,8 +645,8 @@ function downloadCurrentImage() {
 }
 
 // ============ 复制图片功能 ============
-// ============ 复制图片功能（带有视觉反馈） ============
-function copyImage() {
+// ============ 终极复制图片功能（Canvas 渲染版） ============
+async function copyImage() {
   const image = currentViewingImages[currentViewingImageIndex];
   const copyBtn = copyImageUrlBtn;
 
@@ -654,86 +654,75 @@ function copyImage() {
   const originalText = copyBtn.innerHTML;
   const originalClass = copyBtn.className;
 
-  // 设置复制中状态
+  // UI 反馈
   copyBtn.classList.add("copying");
-  copyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 复制中...';
+  copyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 正在处理图片...';
   copyBtn.disabled = true;
 
-  // 1.5秒后自动恢复（防止卡死）
-  const timeoutId = setTimeout(() => {
-    resetCopyButton(copyBtn, originalText, originalClass);
-  }, 1500);
+  try {
+    // 1. 创建 Image 对象并加载图片
+    const img = new Image();
+    // 允许跨域请求图片数据（如果服务器支持）
+    img.crossOrigin = "Anonymous";
 
-  // 实际复制逻辑
-  navigator.clipboard
-    .writeText(image.src)
-    .then(() => {
-      clearTimeout(timeoutId);
-
-      // 复制成功状态
-      copyBtn.classList.remove("copying");
-      copyBtn.classList.add("success");
-      copyBtn.innerHTML = '<i class="fas fa-check"></i> 已复制！';
-
-      // 显示通知
-      showCopyNotification();
-      const notification = document.getElementById("copyNotification");
-      if (notification) {
-        const span = notification.querySelector("span");
-        const icon = notification.querySelector("i");
-        if (span) {
-          if (image.src.startsWith("data:")) {
-            span.textContent = "图片数据已复制！";
-          } else {
-            span.textContent = "图片链接已复制！";
-          }
-        }
-        if (icon) {
-          icon.className = "fas fa-image";
-        }
-      }
-
-      // 2秒后恢复原始状态
-      setTimeout(() => {
-        resetCopyButton(copyBtn, originalText, originalClass);
-      }, 2000);
-    })
-    .catch((err) => {
-      clearTimeout(timeoutId);
-      console.error("复制失败:", err);
-
-      // 复制失败状态
-      copyBtn.classList.remove("copying");
-      copyBtn.classList.add("error");
-      copyBtn.innerHTML = '<i class="fas fa-times"></i> 失败';
-
-      // 降级方案
-      const textArea = document.createElement("textarea");
-      textArea.value = image.src;
-      document.body.appendChild(textArea);
-      textArea.select();
-
-      try {
-        document.execCommand("copy");
-        // 如果降级方案成功，显示成功状态
-        setTimeout(() => {
-          copyBtn.classList.remove("error");
-          copyBtn.classList.add("success");
-          copyBtn.innerHTML = '<i class="fas fa-check"></i> 已复制！';
-          showCopyNotification();
-        }, 100);
-      } catch (e) {
-        // 如果还失败，保持失败状态
-        copyBtn.innerHTML = '<i class="fas fa-times"></i> 复制失败';
-      }
-
-      document.body.removeChild(textArea);
-
-      // 3秒后恢复原始状态
-      setTimeout(() => {
-        resetCopyButton(copyBtn, originalText, originalClass);
-      }, 3000);
+    // 使用 Promise 包装图片加载过程
+    const loadImage = new Promise((resolve, reject) => {
+      img.onload = () => resolve(img);
+      img.onerror = () => reject(new Error("图片加载失败"));
+      img.src = image.src;
     });
+
+    await loadImage;
+
+    // 2. 使用 Canvas 转换为 PNG 格式以获得最高兼容性
+    const canvas = document.createElement("canvas");
+    canvas.width = img.width;
+    canvas.height = img.height;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(img, 0, 0);
+
+    // 3. 将 Canvas 内容转为 Blob
+    const blob = await new Promise((resolve) =>
+      canvas.toBlob(resolve, "image/png"),
+    );
+
+    // 4. 写入剪贴板
+    const data = [new ClipboardItem({ "image/png": blob })];
+    await navigator.clipboard.write(data);
+
+    // --- 成功反馈 ---
+    copyBtn.classList.remove("copying");
+    copyBtn.classList.add("success");
+    copyBtn.innerHTML = '<i class="fas fa-check"></i> 图片已复制';
+
+    showCopyNotification();
+    setTimeout(
+      () => resetCopyButton(copyBtn, originalText, originalClass),
+      2000,
+    );
+  } catch (err) {
+    console.error("Canvas 复制失败，尝试降级:", err);
+
+    // --- 降级方案：如果 Canvas 失败（通常是严重的跨域限制），则尝试复制地址 ---
+    try {
+      await navigator.clipboard.writeText(image.src);
+      copyBtn.innerHTML = '<i class="fas fa-link"></i> 已复制链接';
+    } catch (e) {
+      copyBtn.innerHTML = '<i class="fas fa-times"></i> 复制失败';
+    }
+
+    setTimeout(
+      () => resetCopyButton(copyBtn, originalText, originalClass),
+      2000,
+    );
+  }
+}
+
+// 辅助函数：重置按钮
+function resetCopyButton(btn, originalText, originalClass) {
+  btn.className = originalClass;
+  btn.innerHTML = originalText;
+  btn.disabled = false;
 }
 
 // 辅助函数：重置复制按钮状态
