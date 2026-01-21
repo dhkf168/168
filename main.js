@@ -4,6 +4,20 @@ let nextItemId = parseInt(localStorage.getItem("contentSystemNextItemId")) || 1;
 let nextContentItemId =
   parseInt(localStorage.getItem("contentSystemNextContentItemId")) || 101;
 
+// --- 在这里插入鼠标波纹动效配置 ---
+const RIPPLE_CONFIG = {
+  maxRipples: 20, // 最大同时存在的波纹数
+  baseSize: 80, // 基础大小
+  speedFactor: 3, // 速度感应系数
+  maxSize: 400, // 最大扩散尺寸
+  animationDuration: 1200, // 持续时间
+};
+
+let rippleCount = 0;
+let lastX = 0,
+  lastY = 0;
+let lastTime = 0;
+
 // 当前选中的背景 - 从本地存储加载
 let currentBackground = JSON.parse(
   localStorage.getItem("contentSystemBackground"),
@@ -398,11 +412,18 @@ function renderContentCard(item) {
 }
 
 // 显示右键菜单
-// 修改 showContextMenu() 函数中的条件判断
+// 显示右键菜单 - 完全修复版，确保菜单在可视区域内
 function showContextMenu(e) {
-  contextMenu.style.left = `${e.clientX}px`;
-  contextMenu.style.top = `${e.clientY}px`;
+  // 防止默认右键菜单
+  e.preventDefault();
 
+  // 先隐藏菜单，以便计算正确尺寸
+  contextMenu.classList.remove("active");
+
+  // 强制浏览器重新计算布局
+  contextMenu.style.display = "block";
+
+  // 设置菜单项显示状态
   if (contextMenuTarget) {
     editContextItem.style.display = "flex";
     addContextItem.style.display = "flex";
@@ -412,7 +433,7 @@ function showContextMenu(e) {
       contextMenuTarget.type === "content-card" ||
       contextMenuTarget.type === "main-title" ||
       contextMenuTarget.type === "subtitle" ||
-      contextMenuTarget.type === "image-card" // 添加这行
+      contextMenuTarget.type === "image-card"
     ) {
       insertAfterContextItem.style.display = "flex";
       insertMainTitleAfterItem.style.display = "flex";
@@ -437,7 +458,83 @@ function showContextMenu(e) {
     }
   }
 
-  contextMenu.classList.add("active");
+  // 等待下一帧确保DOM更新
+  setTimeout(() => {
+    // 获取菜单的实际尺寸（包括边框、阴影等）
+    const menuRect = contextMenu.getBoundingClientRect();
+    const menuWidth = menuRect.width;
+    const menuHeight = menuRect.height;
+
+    // 获取窗口尺寸（考虑滚动条）
+    const windowWidth =
+      window.innerWidth || document.documentElement.clientWidth;
+    const windowHeight =
+      window.innerHeight || document.documentElement.clientHeight;
+
+    // 点击位置
+    const clickX = e.clientX;
+    const clickY = e.clientY;
+
+    // 计算初始位置（通常希望在点击点右下方显示）
+    let left = clickX;
+    let top = clickY;
+
+    // 安全边距
+    const margin = 5;
+
+    // ===== 水平方向调整 =====
+    // 检查右侧空间
+    if (left + menuWidth + margin > windowWidth) {
+      // 右侧空间不足，尝试显示在左侧
+      left = clickX - menuWidth - margin;
+
+      // 如果左侧也不够，则紧贴右边界
+      if (left < margin) {
+        left = windowWidth - menuWidth - margin;
+      }
+    } else if (left < margin) {
+      // 左侧空间不足，紧贴左边界
+      left = margin;
+    }
+
+    // ===== 垂直方向调整 =====
+    // 计算上下可用空间
+    const spaceBelow = windowHeight - clickY - margin;
+    const spaceAbove = clickY - margin;
+
+    if (spaceBelow >= menuHeight) {
+      // 下方空间足够，在下方显示
+      top = clickY + margin;
+    } else if (spaceAbove >= menuHeight) {
+      // 上方空间足够，在上方显示
+      top = clickY - menuHeight - margin;
+    } else {
+      // 上下空间都不够，选择空间较大的一侧
+      if (spaceBelow >= spaceAbove) {
+        // 下方空间相对较大
+        top = windowHeight - menuHeight - margin;
+      } else {
+        // 上方空间相对较大
+        top = margin;
+      }
+    }
+
+    // 最终边界检查
+    left = Math.max(margin, Math.min(left, windowWidth - menuWidth - margin));
+    top = Math.max(margin, Math.min(top, windowHeight - menuHeight - margin));
+
+    // 设置位置
+    contextMenu.style.left = `${left}px`;
+    contextMenu.style.top = `${top}px`;
+
+    // 显示菜单
+    contextMenu.style.display = "";
+    contextMenu.classList.add("active");
+
+    console.log(
+      `菜单位置: left=${left}, top=${top}, 尺寸: ${menuWidth}x${menuHeight}, 窗口: ${windowWidth}x${windowHeight}`,
+    );
+  }, 10);
 }
 
 // 滚动到指定内容项
@@ -1550,7 +1647,7 @@ function exportData() {
     const url = URL.createObjectURL(dataBlob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `内容系统备份_${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `内容导出_${new Date().toISOString().slice(0, 10)}.json`;
 
     document.body.appendChild(a);
     a.click();
@@ -2235,19 +2332,96 @@ const Modal = {
   },
 };
 
+function createRipple(x, y, size) {
+  if (rippleCount >= RIPPLE_CONFIG.maxRipples) return;
+
+  const ripple = document.createElement("div");
+  ripple.className = "mouse-ripple";
+
+  // 颜色可以根据需要在这里随机设置，让它更鲜艳
+  const colors = ["#00f2fe", "#fb00ff", "#39ff14", "#ffef00"];
+  const activeColor = colors[Math.floor(Math.random() * colors.length)];
+  ripple.style.borderColor = activeColor;
+  ripple.style.boxShadow = `0 0 15px ${activeColor}`;
+
+  ripple.style.left = x + "px";
+  ripple.style.top = y + "px";
+  ripple.style.width = size + "px";
+  ripple.style.height = size + "px";
+
+  // 初始状态：极小
+  ripple.style.transform = "translate(-50%, -50%) scale(0)";
+  ripple.style.opacity = "0.5";
+
+  document.getElementById("mouse-ripple-container").appendChild(ripple);
+  rippleCount++;
+
+  // 触发扩散动画
+  requestAnimationFrame(() => {
+    ripple.style.transform = `translate(-50%, -50%) scale(1)`;
+    ripple.style.opacity = "0";
+  });
+
+  // 结束后移除
+  setTimeout(() => {
+    ripple.remove();
+    rippleCount--;
+  }, RIPPLE_CONFIG.animationDuration);
+}
+
 // 主初始化函数
 function initializeApp() {
   initBackgroundSelector();
   initOpacityControl();
   initImportExport();
-  initPage();
+  initPage(); // 页面内容渲染在这里完成
   initAutoHideSettings();
   initImageFunctions();
 
-  // 初始化TXT导入功能（如果存在）
+  // 滚动监听（如果存在）
+  if (typeof initScrollSpy === "function") {
+    initScrollSpy();
+  }
+
+  // 窗口尺寸变化时自动关闭右键菜单
+  window.addEventListener("resize", () => {
+    if (contextMenu?.classList.contains("active")) {
+      contextMenu.classList.remove("active");
+    }
+  });
+
+  // TXT 导入功能（如果存在）
   if (typeof initTxtImportFunctions === "function") {
     initTxtImportFunctions();
   }
+
+  document.addEventListener("mousemove", (e) => {
+    const currentTime = Date.now();
+    const deltaTime = currentTime - lastTime;
+
+    // 1. 稍微降低间隔时间（从50改为30），让尾巴更连贯
+    if (deltaTime > 30) {
+      const distance = Math.sqrt(
+        Math.pow(e.clientX - lastX, 2) + Math.pow(e.clientY - lastY, 2),
+      );
+
+      // 2. 这里的 size 决定了圆环扩散后的最终大小
+      // 我们让它随速度稍微变大，但保持在一个精致的范围内
+      const size = Math.min(
+        RIPPLE_CONFIG.maxSize,
+        RIPPLE_CONFIG.baseSize + distance * 1.5, // 降低系数，让圈圈别太大
+      );
+
+      // 3. 降低距离阈值（从10改为5），这样慢速移动时也会有细腻的尾巴
+      if (distance > 5) {
+        createRipple(e.clientX, e.clientY, size);
+
+        lastX = e.clientX;
+        lastY = e.clientY;
+        lastTime = currentTime;
+      }
+    }
+  });
 }
 
 // 页面加载完成后初始化
