@@ -734,7 +734,8 @@ function insertContentAfter(targetId, newItem) {
 }
 
 // 保存内容项
-function saveContentItem(e) {
+// 修改后的保存内容项函数 - 完整版
+async function saveContentItem(e) {
   e.preventDefault();
 
   const textareas = document.querySelectorAll(".content-textarea");
@@ -742,8 +743,9 @@ function saveContentItem(e) {
     .map((ta) => ta.value.trim())
     .filter((text) => text !== "");
 
+  // 1. 替换原有的系统 alert
   if (contents.length === 0) {
-    alert("请至少输入一个内容区域！");
+    await Modal.alert("请至少输入一个内容区域，不能为空！", "输入提示");
     return;
   }
 
@@ -754,6 +756,7 @@ function saveContentItem(e) {
       submitBtn.innerHTML.includes("插入小标题"));
 
   if (currentItemType === "content-item" && currentEditCardItemId) {
+    // 情况 A: 编辑卡片内部的某一项
     const cardIndex = contentItems.findIndex(
       (item) => item.id === currentContentCardId,
     );
@@ -768,6 +771,7 @@ function saveContentItem(e) {
       }
     }
   } else if (currentEditItemId) {
+    // 情况 B: 编辑整个卡片或标题
     const itemIndex = contentItems.findIndex(
       (item) => item.id === currentEditItemId,
     );
@@ -784,6 +788,7 @@ function saveContentItem(e) {
       }
     }
   } else if (isInsertOperation) {
+    // 情况 C: 插入操作（右键菜单触发）
     let newItem;
 
     if (currentItemType === "content-card") {
@@ -819,6 +824,7 @@ function saveContentItem(e) {
     insertContentAfter(currentInsertAfterId, newItem);
     currentInsertAfterId = null;
   } else {
+    // 情况 D: 普通新增操作（页面底部按钮触发）
     let newItem;
 
     if (currentItemType === "content-card") {
@@ -846,10 +852,13 @@ function saveContentItem(e) {
     contentItems.push(newItem);
   }
 
+  // 重置表单并保存数据
   contentForm.reset();
   modalOverlay.classList.remove("active");
   initPage();
+  saveToLocalStorage(); // 确保保存到本地存储
 
+  // 如果是插入操作，执行滚动定位和高亮效果
   if (isInsertOperation) {
     setTimeout(() => {
       const newItemId = nextItemId - 1;
@@ -864,6 +873,7 @@ function saveContentItem(e) {
 
       const originalBg = newItemElement.style.background;
 
+      // 根据模式和类型设置高亮颜色
       if (isLightMode) {
         if (currentItemType === "main-title") {
           newItemElement.style.background = "rgba(255, 64, 129, 0.3)";
@@ -882,34 +892,48 @@ function saveContentItem(e) {
         }
       }
 
+      // 1.5秒后恢复原始背景
       setTimeout(() => {
         newItemElement.style.background = originalBg;
       }, 1500);
 
+      // 如果是大标题，刷新导航栏
       if (currentItemType === "main-title") {
-        renderNavItems();
-        setTimeout(() => {
-          document.querySelectorAll(".nav-item").forEach((item) => {
-            item.classList.remove("active");
-            if (parseInt(item.dataset.id) === newItemId) {
-              item.classList.add("active");
-            }
-          });
-        }, 100);
+        if (typeof renderNavItems === "function") {
+          renderNavItems();
+          setTimeout(() => {
+            document.querySelectorAll(".nav-item").forEach((item) => {
+              item.classList.remove("active");
+              if (parseInt(item.dataset.id) === newItemId) {
+                item.classList.add("active");
+              }
+            });
+          }, 100);
+        }
       }
     }, 300);
   }
 }
 
 // 删除内容项
-function deleteContentItem() {
+async function deleteContentItem() {
   if (!contextMenuTarget) return;
 
-  if (!confirm("确定要删除这个内容吗？")) return;
-
+  // 1. 在 await 之前，先解构保存需要的数据
+  // 因为 Modal 弹窗是异步的，如果中途 contextMenuTarget 被其他操作清空，逻辑会失效
   const { type, id, cardId } = contextMenuTarget;
 
+  // 2. 调用自定义确认弹窗
+  const isConfirmed = await Modal.confirm(
+    "确定要删除这个内容吗？删除后无法恢复。",
+    "确认删除",
+  );
+
+  if (!isConfirmed) return;
+
+  // 3. 执行删除逻辑
   if (type === "content-item") {
+    // 情况 A: 删除卡片内部的某一项
     const cardIndex = contentItems.findIndex((item) => item.id === cardId);
     if (cardIndex !== -1) {
       contentItems[cardIndex].content = contentItems[cardIndex].content.filter(
@@ -917,13 +941,25 @@ function deleteContentItem() {
       );
     }
   } else {
+    // 情况 B: 删除整个卡片 (标题卡、图片卡等)
     contentItems = contentItems.filter((item) => item.id !== id);
+
+    // 重新排序
     contentItems.forEach((item, index) => {
       item.order = index + 1;
     });
   }
 
+  // 4. 更新界面并保存
   initPage();
+  saveToLocalStorage(); // 记得调用保存，确保刷新后删除依然生效
+
+  // 5. 显示删除成功通知
+  if (typeof showCopyNotification === "function") {
+    showCopyNotification();
+    const notifySpan = document.querySelector("#copyNotification span");
+    if (notifySpan) notifySpan.textContent = "内容已删除";
+  }
 }
 
 // 设置背景
@@ -1000,8 +1036,11 @@ function setBackground(type, src, isLocalFile = false) {
 }
 
 // 预览上传的文件
-function previewUploadedFile(file) {
+// 修改后的文件预览函数 - 支持视频/图片预览及自定义错误弹窗
+async function previewUploadedFile(file) {
   const previewArea = uploadPreview;
+
+  // 1. 初始化预览区域
   previewArea.innerHTML = "";
 
   if (!file) {
@@ -1013,24 +1052,54 @@ function previewUploadedFile(file) {
   const isImage = fileType.startsWith("image/");
   const isVideo = fileType.startsWith("video/");
 
+  // 2. 替代原来的 innerHTML 提示，改用自定义弹窗
   if (!isImage && !isVideo) {
-    previewArea.innerHTML = "<p>不支持的文件格式</p>";
+    previewArea.innerHTML = "<p style='color: #ff6b35;'>不支持的文件格式</p>";
+    // 使用 await 确保用户看到并点击确认后，程序再继续或结束
+    await Modal.alert(
+      "当前仅支持图片（JPG, PNG, WebP）或视频（MP4）格式的文件。",
+      "格式不支持",
+    );
     return;
   }
 
+  // 3. 处理文件读取
   const reader = new FileReader();
+
+  // 显示加载中状态
+  previewArea.innerHTML =
+    "<div class='loading-spinner'><i class='fas fa-spinner fa-spin'></i> 读取中...</div>";
+
   reader.onload = function (e) {
+    previewArea.innerHTML = ""; // 清除加载状态
+
     if (isImage) {
       const img = document.createElement("img");
       img.src = e.target.result;
+      img.style.maxWidth = "100%";
+      img.style.maxHeight = "300px"; // 限制预览高度
+      img.style.borderRadius = "8px";
+      img.style.boxShadow = "0 4px 12px rgba(0,0,0,0.2)";
       previewArea.appendChild(img);
     } else if (isVideo) {
       const video = document.createElement("video");
       video.src = e.target.result;
       video.controls = true;
       video.muted = true;
+      video.autoplay = true; // 预览时自动播放
+      video.style.maxWidth = "100%";
+      video.style.maxHeight = "300px";
+      video.style.borderRadius = "8px";
       previewArea.appendChild(video);
     }
+  };
+
+  reader.onerror = async function () {
+    previewArea.innerHTML = "<p>文件读取失败</p>";
+    await Modal.alert(
+      "无法读取该文件，请检查文件是否损坏或被占用。",
+      "读取错误",
+    );
   };
 
   reader.readAsDataURL(file);
@@ -1068,6 +1137,7 @@ function previewCustomLink(url) {
 }
 
 // 初始化背景选择功能
+// 修改后的背景选择器初始化函数 - 完整版
 function initBackgroundSelector() {
   backgroundSelectorBtn.addEventListener("click", () => {
     document.querySelectorAll(".background-option").forEach((option) => {
@@ -1082,9 +1152,10 @@ function initBackgroundSelector() {
     if (currentOption && currentBackground.type !== "none") {
       currentOption.classList.add("selected");
     } else {
-      document
-        .querySelector('.background-option[data-type="none"]')
-        .classList.add("selected");
+      const noneOption = document.querySelector(
+        '.background-option[data-type="none"]',
+      );
+      if (noneOption) noneOption.classList.add("selected");
     }
 
     customBackgroundInput.value = "";
@@ -1125,7 +1196,8 @@ function initBackgroundSelector() {
     fileUploadArea.style.background = "rgba(255, 153, 0, 0.05)";
   });
 
-  fileUploadArea.addEventListener("drop", (e) => {
+  // 改为 async 处理拖放
+  fileUploadArea.addEventListener("drop", async (e) => {
     e.preventDefault();
     fileUploadArea.style.borderColor = "rgba(255, 255, 255, 0.1)";
     fileUploadArea.style.background = "rgba(255, 153, 0, 0.05)";
@@ -1134,10 +1206,13 @@ function initBackgroundSelector() {
     if (files.length > 0) {
       const file = files[0];
       if (file.type.startsWith("image/") || file.type.startsWith("video/")) {
-        backgroundFileInput.files = files; // 原始代码的直接赋值
+        // 使用 DataTransfer 确保 input.files 被正确填充
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        backgroundFileInput.files = dataTransfer.files;
         previewUploadedFile(file);
       } else {
-        alert("请选择图片或视频文件");
+        await Modal.alert("请选择图片或视频文件作为背景。", "格式不支持");
       }
     }
   });
@@ -1158,9 +1233,11 @@ function initBackgroundSelector() {
     }
   });
 
-  applyBackgroundBtn.addEventListener("click", () => {
-    const activeTab = document.querySelector(".background-tab.active").dataset
-      .tab;
+  // 改为 async 处理背景应用逻辑
+  applyBackgroundBtn.addEventListener("click", async () => {
+    const activeTabEl = document.querySelector(".background-tab.active");
+    if (!activeTabEl) return;
+    const activeTab = activeTabEl.dataset.tab;
 
     if (activeTab === "preset") {
       const selectedOption = document.querySelector(
@@ -1175,7 +1252,7 @@ function initBackgroundSelector() {
     } else if (activeTab === "upload") {
       const file = backgroundFileInput.files[0];
       if (!file) {
-        alert("请先选择一个文件");
+        await Modal.alert("请先上传一个图片或视频文件。", "未选择文件");
         return;
       }
 
@@ -1184,7 +1261,7 @@ function initBackgroundSelector() {
       const isVideo = fileType.startsWith("video/");
 
       if (!isImage && !isVideo) {
-        alert("请选择图片或视频文件");
+        await Modal.alert("不支持的文件格式，请选择图片或视频。", "格式错误");
         return;
       }
 
@@ -1198,7 +1275,7 @@ function initBackgroundSelector() {
     } else if (activeTab === "custom") {
       const url = customBackgroundInput.value.trim();
       if (!url) {
-        alert("请输入图片或视频链接");
+        await Modal.alert("请输入有效的图片或视频链接地址。", "输入为空");
         return;
       }
 
@@ -1207,8 +1284,9 @@ function initBackgroundSelector() {
         setBackground(type, url, false);
         backgroundModal.classList.remove("active");
       } else {
-        alert(
-          "请输入有效的图片或视频链接（支持jpg, png, gif, mp4, webm, ogg格式）",
+        await Modal.alert(
+          "请输入有效的链接，支持常见格式：\njpg, png, gif, webp, mp4, webm",
+          "链接无效",
         );
       }
     }
@@ -1316,6 +1394,7 @@ function switchTab(modalType, tabId) {
 }
 
 // 初始化导入导出功能
+// 修改后的导入导出初始化函数 - 完整版
 function initImportExport() {
   exportBtn.addEventListener("click", () => {
     switchTab("import-export", "export");
@@ -1338,6 +1417,7 @@ function initImportExport() {
 
   exportActionBtn.addEventListener("click", exportData);
   importActionBtn.addEventListener("click", importData);
+
   cancelImportExportBtn.addEventListener("click", () => {
     importExportModal.classList.remove("active");
   });
@@ -1362,7 +1442,8 @@ function initImportExport() {
     importFileArea.style.background = "rgba(255, 51, 102, 0.05)";
   });
 
-  importFileArea.addEventListener("drop", (e) => {
+  // 改为 async 以支持自定义弹窗
+  importFileArea.addEventListener("drop", async (e) => {
     e.preventDefault();
     importFileArea.style.borderColor = "rgba(255, 255, 255, 0.1)";
     importFileArea.style.background = "rgba(255, 51, 102, 0.05)";
@@ -1370,11 +1451,22 @@ function initImportExport() {
     const files = e.dataTransfer.files;
     if (files.length > 0) {
       const file = files[0];
-      if (file.name.endsWith(".json")) {
-        importFileInput.files = files; // 原始代码的直接赋值
+      const fileName = file.name.toLowerCase();
+
+      // 检查是否为 JSON 或 TXT 文件
+      if (fileName.endsWith(".json") || fileName.endsWith(".txt")) {
+        // 使用 DataTransfer 规范化赋值
+        const dataTransfer = new DataTransfer();
+        dataTransfer.items.add(file);
+        importFileInput.files = dataTransfer.files;
+
         previewImportFile(file);
       } else {
-        alert("请选择JSON格式文件");
+        // 替换原来的 alert
+        await Modal.alert(
+          "请选择有效的 JSON 或 TXT 格式文件进行导入。",
+          "不支持的文件格式",
+        );
       }
     }
   });
@@ -1392,7 +1484,6 @@ function initImportExport() {
     }
   });
 }
-
 // 更新导出数据预览
 function updateExportPreview() {
   const exportFormat = document.querySelector(
@@ -1672,35 +1763,42 @@ function previewImportFile(file) {
 }
 
 // 导入数据
-// 导入数据
-function importData() {
+// ============ 完整导入功能（集成自定义弹窗与 ID 同步） ============
+async function importData() {
   const file = importFileInput.files[0];
 
+  // 1. 检查文件选择
   if (!file) {
-    alert("请先选择一个文件");
+    await Modal.alert("请先选择一个文件后再进行导入操作。", "提示");
     return;
   }
 
   const previewArea = importPreview;
   const parsedData = previewArea.dataset.parsedData;
 
+  // 2. 检查预览数据
   if (!parsedData) {
-    alert("请先预览文件内容");
+    await Modal.alert("请先点击预览按钮确认文件内容是否正确。", "预览缺失");
     return;
   }
 
   try {
     const data = JSON.parse(parsedData);
 
-    // 检查是否从TXT解析而来
+    // 检查是否从 TXT 解析而来
     const isFromTxt = data.parsedFromTxt || false;
     const itemsToImport = data.contentItems || data;
 
+    // 3. 检查数据有效性
     if (!Array.isArray(itemsToImport) || itemsToImport.length === 0) {
-      alert("没有找到可导入的内容");
+      await Modal.alert(
+        "该文件中没有找到任何有效的内容项，请检查文件格式。",
+        "导入失败",
+      );
       return;
     }
 
+    // 构建确认消息（统计信息）
     let confirmMessage = `确定要导入 ${itemsToImport.length} 个内容项吗？`;
 
     if (isFromTxt) {
@@ -1717,56 +1815,57 @@ function importData() {
         (item) => item.type === "content-card",
       ).length;
 
-      confirmMessage = `确定要导入 ${itemsToImport.length} 个内容项吗？\n\nTXT解析结果：\n• ${titles} 个大标题\n• ${subtitles} 个小标题\n• ${images} 张图片\n• ${contentCards} 个内容卡片`;
+      confirmMessage = `确定要导入 ${itemsToImport.length} 个内容项吗？\n\nTXT解析结果：\n• ${titles} 个大标题\n• ${subtitles} 个小标题\n• ${images} 组图片卡\n• ${contentCards} 个内容卡片`;
     }
 
-    if (!confirm(confirmMessage + "\n\n导入将替换当前所有内容！")) {
-      return;
-    }
+    // 4. 确认导入操作
+    const fullConfirmMessage =
+      confirmMessage + "\n\n注意：导入操作将替换当前页面上的所有内容！";
+    const isConfirmed = await Modal.confirm(fullConfirmMessage, "确认导入");
+
+    if (!isConfirmed) return;
+
+    // --- 开始执行数据覆盖逻辑 ---
 
     // 清空现有内容
     contentItems = [];
 
-    // 导入数据
     if (isFromTxt) {
-      // TXT解析的数据
+      // --- 情况 A: TXT 解析的数据导入 ---
       contentItems = itemsToImport;
 
-      // 更新ID计数器
+      // 自动更新全局 ID 计数器，防止后续新增内容时 ID 冲突
+      // 更新主项目 ID
       if (itemsToImport.length > 0) {
         const maxId = Math.max(...itemsToImport.map((item) => item.id || 0));
         nextItemId = Math.max(nextItemId, maxId + 1);
       }
 
-      // 更新内容项ID
-      const allContentItems = itemsToImport
+      // 更新子内容项 ID (Content Card 内部项)
+      const allSubItems = itemsToImport
         .filter((item) => item.type === "content-card")
-        .flatMap((item) => item.content || [])
-        .map((item) => item.id)
-        .filter((id) => !isNaN(id));
-
-      if (allContentItems.length > 0) {
-        const maxContentId = Math.max(...allContentItems);
-        nextContentItemId = Math.max(nextContentItemId, maxContentId + 1);
+        .flatMap((item) => item.content || []);
+      if (allSubItems.length > 0) {
+        const maxSubId = Math.max(...allSubItems.map((item) => item.id || 0));
+        nextContentItemId = Math.max(nextContentItemId, maxSubId + 1);
       }
 
-      // 更新图片ID
+      // 更新图片 ID
       const allImages = itemsToImport
         .filter((item) => item.type === "image-card")
-        .flatMap((item) => item.images || [])
-        .map((img) => img.id)
-        .filter((id) => !isNaN(id));
-
+        .flatMap((item) => item.images || []);
       if (allImages.length > 0) {
-        const maxImageId = Math.max(...allImages);
-        nextImageId = Math.max(nextImageId, maxImageId + 1);
+        const maxImgId = Math.max(...allImages.map((img) => img.id || 0));
+        nextImageId = Math.max(nextImageId, maxImgId + 1);
       }
     } else {
-      // 标准JSON数据
+      // --- 情况 B: 标准 JSON 数据导入 ---
       contentItems = data.contentItems || [];
       nextItemId = data.nextItemId || nextItemId;
       nextContentItemId = data.nextContentItemId || nextContentItemId;
+      if (data.nextImageId) nextImageId = data.nextImageId;
 
+      // 恢复背景设置
       if (data.currentBackground) {
         currentBackground = data.currentBackground;
         setBackground(
@@ -1776,6 +1875,7 @@ function importData() {
         );
       }
 
+      // 恢复透明度设置
       if (data.backgroundOpacity) {
         setOpacity(
           data.backgroundOpacity,
@@ -1783,26 +1883,32 @@ function importData() {
         );
       }
 
+      // 恢复主题模式
       if (typeof data.isLightMode !== "undefined") {
         setTheme(data.isLightMode);
       }
     }
 
-    // 重新初始化页面
+    // 5. 持久化与刷新页面
     initPage();
     saveToLocalStorage();
 
-    // 显示成功通知
+    // 6. 成功反馈
     showCopyNotification();
-    copyNotification.querySelector("span").textContent =
-      `成功导入 ${itemsToImport.length} 个内容项！`;
+    const notifySpan = document.querySelector("#copyNotification span");
+    if (notifySpan) {
+      notifySpan.textContent = `成功导入 ${itemsToImport.length} 个内容项！`;
+    }
 
-    // 关闭模态框
-    setTimeout(() => {
-      importExportModal.classList.remove("active");
-    }, 500);
+    // 7. 关闭导入弹窗
+    if (typeof importExportModal !== "undefined") {
+      setTimeout(() => {
+        importExportModal.classList.remove("active");
+      }, 500);
+    }
   } catch (error) {
-    alert(`导入失败: ${error.message}`);
+    console.error("Import Error:", error);
+    await Modal.alert(`导入过程中发生错误: ${error.message}`, "错误");
   }
 }
 
@@ -2022,6 +2128,112 @@ document.addEventListener("click", resetAutoHideTimer);
 
 window.addEventListener("resize", () => {});
 window.addEventListener("beforeunload", saveToLocalStorage);
+
+// ============ 全局自定义弹窗管理器 ============
+/**
+ * 全局自定义弹窗对象
+ * 支持 Promise 异步调用：await Modal.confirm("内容")
+ */
+const Modal = {
+  // 核心显示逻辑
+  show: function ({
+    title = "提示",
+    message = "",
+    type = "confirm", // 'confirm' 或 'alert'
+    onConfirm = null,
+  }) {
+    let overlay = document.getElementById("globalCustomModal");
+
+    // 1. 如果不存在则创建结构
+    if (!overlay) {
+      overlay = document.createElement("div");
+      overlay.id = "globalCustomModal";
+      overlay.className = "custom-modal-overlay";
+      overlay.innerHTML = `
+        <div class="custom-modal-content">
+          <div class="custom-modal-icon"></div>
+          <div class="custom-modal-title"></div>
+          <div class="custom-modal-message"></div>
+          <div class="custom-modal-actions">
+            <button class="modal-btn cancel-btn">取消</button>
+            <button class="modal-btn confirm-btn">确定</button>
+          </div>
+        </div>
+      `;
+      document.body.appendChild(overlay);
+    }
+
+    const iconEl = overlay.querySelector(".custom-modal-icon");
+    const titleEl = overlay.querySelector(".custom-modal-title");
+    const msgEl = overlay.querySelector(".custom-modal-message");
+    const confirmBtn = overlay.querySelector(".confirm-btn");
+    const cancelBtn = overlay.querySelector(".cancel-btn");
+
+    // 2. 根据类型动态设置内容和外观
+    overlay.className = `custom-modal-overlay modal-type-${type}`;
+    titleEl.textContent = title;
+    msgEl.textContent = message;
+
+    // 设置图标：alert 用感叹号，confirm 用问号
+    iconEl.innerHTML =
+      type === "alert"
+        ? '<i class="fas fa-exclamation-circle"></i>'
+        : '<i class="fas fa-question-circle"></i>';
+
+    // 激活显示（触发 CSS 动画）
+    requestAnimationFrame(() => {
+      overlay.classList.add("active");
+    });
+
+    // 3. 事件处理：使用 Promise 封装
+    return new Promise((resolve) => {
+      // 封装关闭逻辑（带动画延迟）
+      const close = (result) => {
+        overlay.classList.remove("active");
+        // 等待 CSS 中的 0.3s/0.4s 动画结束后再彻底 resolve
+        setTimeout(() => {
+          if (result && onConfirm) onConfirm();
+          resolve(result);
+        }, 300);
+      };
+
+      // 绑定点击事件
+      confirmBtn.onclick = (e) => {
+        e.stopPropagation();
+        close(true);
+      };
+
+      cancelBtn.onclick = (e) => {
+        e.stopPropagation();
+        close(false);
+      };
+
+      // 点击遮罩层背景关闭（等同于取消）
+      overlay.onclick = (e) => {
+        if (e.target === overlay) close(false);
+      };
+    });
+  },
+
+  /**
+   * 替代系统自带的 alert
+   * @param {string} message 提示消息
+   * @param {string} title 标题
+   */
+  alert: function (message, title = "提醒") {
+    // 以后都只给我一条最推荐的翻译：使用 await 方式调用
+    return this.show({ title, message, type: "alert" });
+  },
+
+  /**
+   * 替代系统自带的 confirm
+   * @param {string} message 询问消息
+   * @param {string} title 标题
+   */
+  confirm: function (message, title = "确认操作") {
+    return this.show({ title, message, type: "confirm" });
+  },
+};
 
 // 主初始化函数
 function initializeApp() {
