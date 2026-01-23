@@ -564,30 +564,30 @@ body.light-mode .nav-item:hover {
 /* 1. 顺滑重力下坠 */
 @keyframes smoothGravityDrop {
   0% {
-    transform: translateY(-50px) scale(0.95);
+    transform: translateY(-10px) scale(0.95);
     opacity: 0;
     box-shadow:
       0 10px 25px rgba(255, 51, 102, 0.4),
       0 5px 15px rgba(255, 51, 102, 0.3);
   }
   20% {
-    transform: translateY(-15px) scale(0.96);
+    transform: translateY(5px) scale(0.96);
     opacity: 0.6;
   }
   40% {
-    transform: translateY(10px) scale(0.97);
+    transform: translateY(15px) scale(0.97);
     opacity: 0.8;
   }
   60% {
-    transform: translateY(25px) scale(0.98);
+    transform: translateY(30px) scale(0.98);
     opacity: 0.9;
   }
   80% {
-    transform: translateY(35px) scale(0.99);
+    transform: translateY(40px) scale(0.99);
     opacity: 0.95;
   }
   100% {
-    transform: translateY(40px) scale(1);
+    transform: translateY(45px) scale(1);
     opacity: 1;
     box-shadow:
       0 15px 35px rgba(255, 51, 102, 0.6),
@@ -2871,3 +2871,4 @@ body.light-mode .cancel-btn {
     transform 1.2s cubic-bezier(0, 0, 0.2, 1),
     opacity 1.2s linear;
 }
+
