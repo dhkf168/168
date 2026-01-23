@@ -2369,6 +2369,40 @@ function createRipple(x, y, size) {
   }, RIPPLE_CONFIG.animationDuration);
 }
 
+// 在您的JavaScript中添加：
+document.addEventListener('DOMContentLoaded', function() {
+  const navItems = document.querySelectorAll('.nav-item');
+  
+  navItems.forEach(item => {
+    item.addEventListener('click', function(e) {
+      if (this.classList.contains('active')) return;
+      
+      // 移除所有active状态
+      navItems.forEach(nav => {
+        nav.classList.remove('active', 'animated', 'breathing', 'after-bounce');
+      });
+      
+      // 添加基础active
+      this.classList.add('active');
+      
+      // 延迟添加animated类，避免同时加载所有动画
+      setTimeout(() => {
+        this.classList.add('animated');
+        
+        // 进一步延迟添加呼吸效果
+        setTimeout(() => {
+          this.classList.add('breathing');
+        }, 1000);
+        
+        // 添加微震动效果
+        setTimeout(() => {
+          this.classList.add('after-bounce');
+        }, 1300);
+      }, 50);
+    });
+  });
+});
+
 // 主初始化函数
 function initializeApp() {
   initBackgroundSelector();
@@ -2496,4 +2530,5 @@ if (document.readyState === "loading") {
   console.log("文档已经加载完成，立即初始化...");
   initializeApp();
 }
+
 
