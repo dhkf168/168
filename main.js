@@ -541,7 +541,7 @@ function showContextMenu(e) {
 function scrollToItem(itemId) {
   const itemElement = document.getElementById(`item-${itemId}`);
   if (itemElement) {
-    itemElement.scrollIntoView({ behavior: "smooth", block: "start" });
+    itemElement.scrollIntoView({ behavior: "auto", block: "start" });
 
     const originalBackground = itemElement.style.background;
     if (isLightMode) {
@@ -2496,3 +2496,4 @@ if (document.readyState === "loading") {
   console.log("文档已经加载完成，立即初始化...");
   initializeApp();
 }
+
