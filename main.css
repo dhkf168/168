@@ -1222,25 +1222,11 @@ body.light-mode .import-export-modal-title {
   background-clip: text;
 }
 
-.background-modal-title {
-  background: var(--gradient-warning);
-}
-
-body.light-mode .background-modal-title {
-  background: var(--gradient-warning-light);
-}
 
 .opacity-modal-title {
   background: var(--gradient-info);
 }
 
-.import-export-modal-title {
-  background: var(--gradient-purple);
-}
-
-body.light-mode .import-export-modal-title {
-  background: var(--gradient-purple-light);
-}
 
 /* 关闭按钮 */
 .close-modal {
@@ -3165,4 +3151,5 @@ body.light-mode .click-burst-line {
       scaleY(1.2);
   }
 }
+
 
