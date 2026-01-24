@@ -34,7 +34,13 @@ let overlayOpacity =
   parseInt(localStorage.getItem("contentSystemOverlayOpacity")) || 30;
 
 // 主题模式 - 从本地存储加载
-let isLightMode = localStorage.getItem("contentSystemTheme") === "light";
+// 主题模式 - 默认设为浅色模式（白色主题）
+let isLightMode = localStorage.getItem("contentSystemTheme") === "light" || true;
+// 如果本地存储没有值，则使用浅色模式
+if (localStorage.getItem("contentSystemTheme") === null) {
+  isLightMode = true;
+  localStorage.setItem("contentSystemTheme", "light");
+}
 
 // DOM元素
 const navItemsContainer = document.getElementById("navItems");
@@ -2693,3 +2699,4 @@ const VISUAL_EFFECTS = {
     }, 2000);
   },
 };
+
