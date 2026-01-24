@@ -29,9 +29,9 @@ let currentBackground = JSON.parse(
 
 // 透明度设置 - 从本地存储加载
 let backgroundOpacity =
-  parseInt(localStorage.getItem("contentSystemOpacity")) || 30;
+  parseInt(localStorage.getItem("contentSystemOpacity")) || 80;
 let overlayOpacity =
-  parseInt(localStorage.getItem("contentSystemOverlayOpacity")) || 30;
+  parseInt(localStorage.getItem("contentSystemOverlayOpacity")) || 80;
 
 // 主题模式 - 从本地存储加载
 // 主题模式 - 默认设为浅色模式（白色主题）
@@ -2699,4 +2699,5 @@ const VISUAL_EFFECTS = {
     }, 2000);
   },
 };
+
 
