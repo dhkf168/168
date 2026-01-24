@@ -2181,9 +2181,25 @@ deleteContextItem.addEventListener("click", () => {
 });
 
 // 全局事件
-document.addEventListener("click", () => {
-  contextMenu.classList.remove("active");
-  contextMenuTarget = null;
+document.addEventListener("click", (e) => {
+  // 1. 触发视觉特效 (新增)
+  VISUAL_EFFECTS.triggerAll(e);
+
+  // 2. 原有逻辑：重置自动隐藏计时器
+  resetAutoHideTimer();
+
+  // 3. 原有逻辑：关闭右键菜单
+  // 检查是否点击了菜单内部，如果没有则关闭
+  if (contextMenu && contextMenu.classList.contains("active")) {
+    // 如果点击的不是菜单本身且不是触发菜单的元素，则关闭
+    if (!e.target.closest("#contextMenu")) {
+      contextMenu.classList.remove("active");
+      contextMenuTarget = null;
+    }
+  }
+
+  // 4. 原有逻辑：关闭背景选择等模态框外部点击 (如果模态框代码里没处理好冒泡)
+  // 此处保留你原有的逻辑即可，通常模态框有自己的监听器
 });
 
 document.addEventListener("contextmenu", (e) => {
@@ -2370,33 +2386,33 @@ function createRipple(x, y, size) {
 }
 
 // 在您的JavaScript中添加：
-document.addEventListener('DOMContentLoaded', function() {
-  const navItems = document.querySelectorAll('.nav-item');
-  
-  navItems.forEach(item => {
-    item.addEventListener('click', function(e) {
-      if (this.classList.contains('active')) return;
-      
+document.addEventListener("DOMContentLoaded", function () {
+  const navItems = document.querySelectorAll(".nav-item");
+
+  navItems.forEach((item) => {
+    item.addEventListener("click", function (e) {
+      if (this.classList.contains("active")) return;
+
       // 移除所有active状态
-      navItems.forEach(nav => {
-        nav.classList.remove('active', 'animated', 'breathing', 'after-bounce');
+      navItems.forEach((nav) => {
+        nav.classList.remove("active", "animated", "breathing", "after-bounce");
       });
-      
+
       // 添加基础active
-      this.classList.add('active');
-      
+      this.classList.add("active");
+
       // 延迟添加animated类，避免同时加载所有动画
       setTimeout(() => {
-        this.classList.add('animated');
-        
+        this.classList.add("animated");
+
         // 进一步延迟添加呼吸效果
         setTimeout(() => {
-          this.classList.add('breathing');
+          this.classList.add("breathing");
         }, 1000);
-        
+
         // 添加微震动效果
         setTimeout(() => {
-          this.classList.add('after-bounce');
+          this.classList.add("after-bounce");
         }, 1300);
       }, 50);
     });
@@ -2531,4 +2547,149 @@ if (document.readyState === "loading") {
   initializeApp();
 }
 
+/* ==================== 新增：全能点击特效管理器 (超慢动作版) ==================== */
 
+const VISUAL_EFFECTS = {
+  // 配置
+  symbols: ["❤️", "⭐", "✨", "🌸", "🔥", "💎", "🎵", "🦋", "🍀"],
+  colors: [
+    "#ff00cc",
+    "#3333ff",
+    "#00ffcc",
+    "#ffcc00",
+    "#ff3366",
+    "#00f2fe",
+    "#ffffff",
+  ],
+
+  // 入口函数
+  triggerAll: function (e) {
+    const x = e.clientX;
+    const y = e.clientY;
+
+    this.createRipple(x, y);
+    this.createFloater(x, y);
+    this.createParticles(x, y);
+    this.createMagicRing(x, y);
+    this.createBurstLines(x, y);
+
+    const targetEl = e.target.closest(
+      ".content-item, .content-card, .position-btn, .nav-item, .image-item, .viewer-action-btn",
+    );
+    if (targetEl) {
+      this.triggerBorderEffect(targetEl);
+    }
+  },
+
+  // 1. 全屏柔光波纹 (对应 CSS: 2s -> 设置 2000ms)
+  createRipple: function (x, y) {
+    const ripple = document.createElement("div");
+    ripple.className = "click-ripple";
+
+    const color = this.colors[Math.floor(Math.random() * this.colors.length)];
+    ripple.style.background = `radial-gradient(circle, ${color}25 0%, ${color}00 65%)`; // 25透明度更淡
+
+    const size = Math.max(window.innerWidth, window.innerHeight) * 0.9;
+    ripple.style.width = `${size}px`;
+    ripple.style.height = `${size}px`;
+    ripple.style.left = `${x}px`;
+    ripple.style.top = `${y}px`;
+
+    document.body.appendChild(ripple);
+    setTimeout(() => ripple.remove(), 2000);
+  },
+
+  // 2. 爱心/星星 (对应 CSS: 4s -> 设置 4000ms)
+  createFloater: function (x, y) {
+    const floater = document.createElement("div");
+    floater.className = "click-floater";
+
+    floater.innerText =
+      this.symbols[Math.floor(Math.random() * this.symbols.length)];
+    const offsetX = (Math.random() - 0.5) * 50;
+    floater.style.left = `${x + offsetX}px`;
+    floater.style.top = `${y}px`;
+
+    const color = this.colors[Math.floor(Math.random() * this.colors.length)];
+    floater.style.color = color;
+
+    document.body.appendChild(floater);
+    setTimeout(() => floater.remove(), 4000);
+  },
+
+  // 3. 粒子爆炸 (对应 CSS: 2.5s -> 设置 2500ms)
+  createParticles: function (x, y) {
+    const particleCount = 14; // 稍微增加粒子数
+
+    for (let i = 0; i < particleCount; i++) {
+      const particle = document.createElement("div");
+      particle.className = "click-particle";
+
+      const color = this.colors[Math.floor(Math.random() * this.colors.length)];
+      particle.style.backgroundColor = color;
+      particle.style.boxShadow = `0 0 10px ${color}`;
+
+      particle.style.left = `${x}px`;
+      particle.style.top = `${y}px`;
+
+      const angle = Math.random() * Math.PI * 2;
+      const velocity = 100 + Math.random() * 140; // 扩散得更远
+      const tx = Math.cos(angle) * velocity;
+      const ty = Math.sin(angle) * velocity;
+
+      particle.style.setProperty("--tx", `${tx}px`);
+      particle.style.setProperty("--ty", `${ty}px`);
+
+      document.body.appendChild(particle);
+      setTimeout(() => particle.remove(), 2500);
+    }
+  },
+
+  // 4. 魔法法阵 (对应 CSS: 2.5s -> 设置 2500ms)
+  createMagicRing: function (x, y) {
+    const ring = document.createElement("div");
+    ring.className = "click-magic-ring";
+
+    const color = this.colors[Math.floor(Math.random() * this.colors.length)];
+    ring.style.borderColor = color;
+    ring.style.boxShadow = `0 0 15px ${color}`;
+
+    ring.style.left = `${x}px`;
+    ring.style.top = `${y}px`;
+
+    document.body.appendChild(ring);
+    setTimeout(() => ring.remove(), 2500);
+  },
+
+  // 5. 极速光线 (对应 CSS: 1.5s -> 设置 1500ms)
+  createBurstLines: function (x, y) {
+    const lineCount = 10;
+
+    for (let i = 0; i < lineCount; i++) {
+      const line = document.createElement("div");
+      line.className = "click-burst-line";
+
+      const angle = (360 / lineCount) * i + Math.random() * 15;
+      line.style.setProperty("--angle", `${angle}deg`);
+
+      const color = this.colors[Math.floor(Math.random() * this.colors.length)];
+      line.style.background = `linear-gradient(to bottom, transparent, ${color}, transparent)`;
+
+      line.style.left = `${x}px`;
+      line.style.top = `${y}px`;
+
+      document.body.appendChild(line);
+      setTimeout(() => line.remove(), 1500);
+    }
+  },
+
+  // 6. 流光边框 (对应 CSS: 2s -> 设置 2000ms)
+  triggerBorderEffect: function (element) {
+    element.classList.remove("click-highlight-border");
+    void element.offsetWidth;
+    element.classList.add("click-highlight-border");
+    setTimeout(() => {
+      element.classList.remove("click-highlight-border");
+    }, 2000);
+  },
+};
