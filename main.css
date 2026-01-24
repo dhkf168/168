@@ -981,7 +981,7 @@ body.light-mode .subtitle {
   );
   border-radius: var(--radius-xl);
   padding: 0;
-  margin-bottom: 12px;
+  margin-bottom: 8px;
   border: 1px solid var(--border-dark);
   box-shadow: var(--shadow-md);
   overflow: hidden;
@@ -2440,6 +2440,7 @@ body.light-mode .empty-state p {
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 10px;
   margin-top: 10px;
+  margin-bottom: 8px;
 }
 
 .image-item {
@@ -3164,3 +3165,4 @@ body.light-mode .click-burst-line {
       scaleY(1.2);
   }
 }
+
