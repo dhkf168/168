@@ -292,7 +292,7 @@ body.light-mode .top-navigation::after {
 }
 
 body.light-mode .position-btn {
-  background: var(--gradient-light-bg);
+  background: var(--gradient-purple-light);
   color: var(--text-light);
   border: 1px solid var(--border-light);
 }
@@ -3184,6 +3184,7 @@ body.light-mode #importPreview {
   border: 1px solid var(--border-light);
   color: var(--text-light);
 }
+
 
 
 
