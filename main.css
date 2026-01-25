@@ -3152,4 +3152,38 @@ body.light-mode .click-burst-line {
   }
 }
 
+/* --- 修复导入预览溢出问题 --- */
+
+/* 1. 限制预览区域的高度并允许内部滚动 */
+#importPreview {
+  max-height: 400px; /* 限制最大高度为400像素 */
+  overflow-y: auto; /* 内容过多时显示垂直滚动条 */
+  padding: 15px;
+  background: rgba(0, 0, 0, 0.2); /* 增加背景色深浅，便于阅读内容 */
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-dark);
+  margin: 15px 0;
+  word-break: break-all; /* 强制长文本换行 */
+}
+
+/* 2. 优化模态框主体，确保在大屏幕或小屏幕上都能正常显示 */
+.modal-content {
+  max-height: 90vh; /* 模态框最高占屏幕高度的90% */
+  display: flex;
+  flex-direction: column;
+}
+
+.modal-body {
+  overflow-y: auto; /* 如果整个表单过长，允许在模态框内滚动 */
+  padding: 20px;
+}
+
+/* 3. 确保浅色模式下的预览区域也清晰 */
+body.light-mode #importPreview {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--border-light);
+  color: var(--text-light);
+}
+
+
 
