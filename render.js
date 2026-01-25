@@ -291,9 +291,6 @@ function parseTxtContent(txtContent) {
 
     // 检查是否是span行
     const isSpan = isSpanLine(line);
-    console.log(
-      `  是否是span行: ${isSpan}, 当前在span序列中: ${inSpanSequence}`,
-    );
 
     // 如果当前有h6项，结束它
     if (currentH6Item) {
@@ -539,48 +536,6 @@ function previewTxtFileComplete(file) {
   });
 }
 
-// 测试函数
-function testCompleteParser() {
-  const exampleContent = `### 项目概述
-
-这是一个测试文档，用于演示TXT文件的完整解析功能。
-
-#### 项目目标
-提高工作效率
-改善用户体验
-降低运营成本
-span监控系统性能
-span收集用户反馈
-
-h5技术栈选择
-前端使用Vue.js框架
-后端使用Node.js
-数据库使用MongoDB
-span支持MySQL和PostgreSQL
-span数据缓存使用Redis
-
-h6前端框架对比
-hhVue.js - 易于上手，学习曲线平缓
-hhReact - 生态丰富，社区活跃
-hhAngular - 企业级应用，类型安全
-
-./images/project-logo.png
-
-项目的第一阶段是需求分析。
-第二阶段是系统设计。
-第三阶段是开发实现。
-span需要定期代码审查
-span自动化测试覆盖率
-
-感谢大家的辛勤工作！`;
-
-  console.log(exampleContent);
-
-  const parsed = parseTxtContent(exampleContent);
-
-  return parsed;
-}
-
 // 初始化
 function initTxtImportFunctions() {
   // 更新界面提示
@@ -604,15 +559,11 @@ function initTxtImportFunctions() {
   }
 }
 
-// 运行测试
-testCompleteParser();
-
 // 导出
 if (typeof module !== "undefined" && module.exports) {
   module.exports = {
     parseTxtContent,
     previewTxtFileComplete,
     initTxtImportFunctions,
-    testCompleteParser,
   };
 }
