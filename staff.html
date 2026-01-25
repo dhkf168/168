@@ -1,20 +1,9 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>客服人数统计</title>
-	  <link
-      rel="icon"
-      href="https://raw.githubusercontent.com/mubai16888/mb/main/mb.ico"
-      type="image/x-icon"
-    />
-    <link
-      rel="icon"
-      href="https://raw.githubusercontent.com/mubai16888/mb/main/mb.png"
-      type="image/png"
-      sizes="192x192"
-    />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
@@ -170,7 +159,9 @@
         border-radius: 12px;
         padding: 15px;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.06);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        transition:
+          transform 0.3s ease,
+          box-shadow 0.3s ease;
         border-top: 4px solid var(--primary);
       }
 
@@ -338,6 +329,48 @@
         color: #6c757d;
         transition: transform 0.3s ease;
         pointer-events: none;
+      }
+
+      /* 在原有的CSS样式中添加以下样式 */
+
+      /* 文件输入样式 */
+      input[type="file"] {
+        padding: 8px;
+        border: 2px dashed #ddd;
+        border-radius: 8px;
+        background: #f8f9fa;
+        cursor: pointer;
+      }
+
+      input[type="file"]:hover {
+        border-color: var(--primary);
+        background: #eef2ff;
+      }
+
+      input[type="file"]::file-selector-button {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 8px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        margin-right: 10px;
+        transition: background 0.3s;
+      }
+
+      input[type="file"]::file-selector-button:hover {
+        background: var(--secondary);
+      }
+
+      /* 禁用状态 */
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      button:disabled:hover {
+        transform: none;
+        box-shadow: none;
       }
 
       .position-title.collapsed i {
@@ -760,9 +793,17 @@
     <div class="container">
       <header>
         <h1><i class="fas fa-users-cog"></i> 客服人数统计</h1>
-        <button class="btn" id="add-module-btn">
-          <i class="fas fa-plus"></i> 添加小组
-        </button>
+        <div style="display: flex; gap: 10px">
+          <button class="btn" id="export-btn">
+            <i class="fas fa-file-export"></i> 导出数据
+          </button>
+          <button class="btn" id="import-btn">
+            <i class="fas fa-file-import"></i> 导入数据
+          </button>
+          <button class="btn" id="add-module-btn">
+            <i class="fas fa-plus"></i> 添加小组
+          </button>
+        </div>
       </header>
 
       <div class="stats-bar">
@@ -937,6 +978,36 @@
             <i class="fas fa-save"></i> 保存
           </button>
           <button class="btn" id="close-details">关闭</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal" id="import-modal">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h2 class="modal-title">
+            <i class="fas fa-file-import"></i> 导入数据
+          </h2>
+          <button class="close-btn">&times;</button>
+        </div>
+        <div class="form-group">
+          <label for="import-file">选择JSON文件</label>
+          <input
+            type="file"
+            id="import-file"
+            class="form-control"
+            accept=".json,application/json"
+          />
+          <div style="margin-top: 10px; font-size: 0.8rem; color: #666">
+            <p><i class="fas fa-info-circle"></i> 支持从本系统导出的JSON文件</p>
+            <p>
+              <i class="fas fa-exclamation-triangle"></i>
+              注意：导入会覆盖当前所有数据
+            </p>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn" id="import-confirm-btn">导入</button>
         </div>
       </div>
     </div>
@@ -1221,6 +1292,239 @@
         renderModules();
         setupEventListeners();
         updateStats();
+        setupImportExportListeners();
+      }
+
+      // 设置导入导出事件监听器
+      function setupImportExportListeners() {
+        // 导出按钮
+        const exportBtn = document.getElementById("export-btn");
+        if (exportBtn) {
+          exportBtn.addEventListener("click", exportData);
+        }
+
+        // 导入按钮
+        const importBtn = document.getElementById("import-btn");
+        if (importBtn) {
+          importBtn.addEventListener("click", () => {
+            openModal("import-modal");
+            // 重置文件输入
+            const importFile = document.getElementById("import-file");
+            if (importFile) importFile.value = "";
+          });
+        }
+
+        // 导入确认按钮
+        const importConfirmBtn = document.getElementById("import-confirm-btn");
+        if (importConfirmBtn) {
+          importConfirmBtn.addEventListener("click", importData);
+          // 初始禁用
+          importConfirmBtn.disabled = true;
+        }
+
+        // 文件选择变化事件
+        const importFile = document.getElementById("import-file");
+        if (importFile) {
+          importFile.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            const importConfirmBtn =
+              document.getElementById("import-confirm-btn");
+            if (importConfirmBtn) {
+              importConfirmBtn.disabled = !file;
+            }
+          });
+        }
+      }
+      // 导出数据为JSON文件
+      function exportData() {
+        try {
+          // 准备导出数据
+          const exportData = {
+            version: "1.0",
+            exportDate: new Date().toISOString(),
+            modules: modules,
+            stats: {
+              moduleCount: modules.length,
+              positionCount: modules.reduce(
+                (total, module) => total + module.positions.length,
+                0,
+              ),
+              staffCount: modules.reduce(
+                (total, module) =>
+                  total +
+                  module.positions.reduce(
+                    (posTotal, position) => posTotal + position.staff.length,
+                    0,
+                  ),
+                0,
+              ),
+            },
+          };
+
+          // 创建JSON字符串
+          const jsonString = JSON.stringify(exportData, null, 2);
+
+          // 创建Blob对象
+          const blob = new Blob([jsonString], { type: "application/json" });
+
+          // 创建下载链接
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement("a");
+          a.href = url;
+          a.download = `客服团队数据_${new Date().toISOString().split("T")[0]}.json`;
+
+          // 触发下载
+          document.body.appendChild(a);
+          a.click();
+
+          // 清理
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+
+          showAlert("数据导出成功！");
+        } catch (error) {
+          console.error("导出失败:", error);
+          showAlert("导出失败，请重试");
+        }
+      }
+
+      // 导入数据
+      function importData() {
+        const fileInput = document.getElementById("import-file");
+        const file = fileInput.files[0];
+
+        if (!file) {
+          showAlert("请选择要导入的文件");
+          return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = function (e) {
+          try {
+            const content = e.target.result;
+            const importedData = JSON.parse(content);
+
+            // 验证导入的数据格式
+            if (!validateImportData(importedData)) {
+              showAlert("文件格式不正确，请选择正确的导出文件");
+              return;
+            }
+
+            // 确认是否覆盖
+            showConfirm(
+              "导入数据将覆盖当前所有数据，是否继续？",
+              (confirmed) => {
+                if (confirmed) {
+                  performImport(importedData);
+                }
+              },
+            );
+          } catch (error) {
+            console.error("导入失败:", error);
+            showAlert("文件解析失败，请确保选择正确的JSON文件");
+          }
+        };
+
+        reader.onerror = function () {
+          showAlert("文件读取失败，请重试");
+        };
+
+        reader.readAsText(file);
+      }
+
+      // 验证导入数据格式
+      function validateImportData(data) {
+        // 基本验证
+        if (!data || typeof data !== "object") return false;
+
+        // 检查是否有modules数组
+        if (!Array.isArray(data.modules)) return false;
+
+        // 验证每个模块的基本结构
+        for (const module of data.modules) {
+          if (!module.id || !module.name || !Array.isArray(module.positions)) {
+            return false;
+          }
+
+          // 验证岗位结构
+          for (const position of module.positions) {
+            if (
+              !position.id ||
+              !position.name ||
+              !Array.isArray(position.staff)
+            ) {
+              return false;
+            }
+
+            // 验证员工结构
+            for (const staff of position.staff) {
+              if (!staff.id || !staff.name) {
+                return false;
+              }
+            }
+          }
+        }
+
+        return true;
+      }
+
+      // 执行导入
+      function performImport(importedData) {
+        try {
+          // 更新模块数据
+          modules = importedData.modules;
+
+          // 保存到本地存储
+          saveToLocalStorage();
+
+          // 重新渲染界面
+          renderModules();
+          updateStats();
+
+          // 关闭模态框
+          closeAllModals();
+
+          showAlert("数据导入成功！");
+        } catch (error) {
+          console.error("导入执行失败:", error);
+          showAlert("导入失败，请重试");
+        }
+      }
+
+      // ... 原有的其他函数保持不变 ...
+
+      // 修改openModal函数，确保导入模态框正确显示
+      function openModal(modalId) {
+        document.getElementById(modalId).style.display = "flex";
+
+        // 如果是导入模态框，重置按钮状态
+        if (modalId === "import-modal") {
+          document.getElementById("import-confirm-btn").disabled = true;
+        }
+      }
+
+      // 修改closeAllModals函数
+      function closeAllModals() {
+        document.querySelectorAll(".modal").forEach((modal) => {
+          modal.style.display = "none";
+        });
+
+        // 清空输入框
+        document.getElementById("module-name").value = "";
+        document.getElementById("position-name").value = "";
+        document.getElementById("staff-name").value = "";
+        document.getElementById("role-input").value = "";
+        document.getElementById("staff-notes").value = "";
+        document.getElementById("detail-role-input").value = "";
+        document.getElementById("import-file").value = "";
+
+        currentModuleId = null;
+        currentPositionId = null;
+        currentStaffId = null;
+        isEditingStaff = false;
+        currentRoles = [];
+        detailRoles = [];
       }
 
       // 生成角色颜色
@@ -1251,9 +1555,8 @@
 
       // 显示输入弹窗
       function showInput(title, defaultValue, callback) {
-        document.getElementById(
-          "input-title"
-        ).innerHTML = `<i class="fas fa-edit"></i> ${title}`;
+        document.getElementById("input-title").innerHTML =
+          `<i class="fas fa-edit"></i> ${title}`;
         document.getElementById("input-value").value = defaultValue || "";
         inputCallback = callback;
         document.getElementById("input-modal").style.display = "flex";
@@ -1537,7 +1840,7 @@
       // 渲染详情页角色标签
       function renderDetailRoles() {
         const rolesContainer = document.getElementById(
-          "detail-roles-container"
+          "detail-roles-container",
         );
         rolesContainer.innerHTML = "";
 
@@ -1610,7 +1913,7 @@
               `确定要删除模块 "${module.name}" 吗？此操作将删除该模块下的所有岗位和成员。`,
               (confirmed) => {
                 if (confirmed) deleteModule(moduleId);
-              }
+              },
             );
           });
         });
@@ -1648,7 +1951,7 @@
               `确定要删除岗位 "${position.name}" 吗？此操作将删除该岗位下的所有成员。`,
               (confirmed) => {
                 if (confirmed) deletePosition(moduleId, positionId);
-              }
+              },
             );
           });
         });
@@ -1864,7 +2167,7 @@
         if (!module) return;
 
         const position = module.positions.find(
-          (p) => p.id == currentPositionId
+          (p) => p.id == currentPositionId,
         );
         if (!position) return;
 
@@ -1912,7 +2215,7 @@
         if (!module) return;
 
         const position = module.positions.find(
-          (p) => p.id == currentPositionId
+          (p) => p.id == currentPositionId,
         );
         if (!position) return;
 
