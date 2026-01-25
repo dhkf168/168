@@ -1,20 +1,9 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-CN">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>高级任务清单</title>
-	  <link
-      rel="icon"
-      href="https://raw.githubusercontent.com/mubai16888/mb/main/mb.ico"
-      type="image/x-icon"
-    />
-    <link
-      rel="icon"
-      href="https://raw.githubusercontent.com/mubai16888/mb/main/mb.png"
-      type="image/png"
-      sizes="192x192"
-    />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css"
@@ -86,8 +75,8 @@
       }
 
       body {
-        font-family: "Noto Sans SC", "Segoe UI", Tahoma, Geneva, Verdana,
-          sans-serif;
+        font-family:
+          "Noto Sans SC", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         line-height: 1.6;
         color: var(--text-color);
         background-color: var(--light-color);
@@ -183,7 +172,9 @@
           var(--primary-dark)
         );
         width: 0%;
-        transition: width 0.5s ease, background-color 0.3s ease;
+        transition:
+          width 0.5s ease,
+          background-color 0.3s ease;
         position: relative;
       }
 
@@ -628,6 +619,62 @@
         opacity: 0.8;
       }
 
+      /* 添加到现有CSS中 */
+      .btn-dropdown {
+        position: relative;
+      }
+
+      .dropdown-menu {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        z-index: 1000;
+        background: var(--bg-color);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-lg);
+        min-width: 180px;
+        margin-top: 5px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        animation: slideDown 0.2s ease;
+      }
+
+      .dropdown-item {
+        width: 100%;
+        padding: 12px 15px;
+        border: none;
+        background: none;
+        text-align: left;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--text-color);
+        transition: var(--transition);
+        font-size: 0.9rem;
+        font-family: inherit;
+      }
+
+      .dropdown-item:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+
+      .dark-mode .dropdown-item:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+
+      .btn-import-export {
+        background-color: var(--info-color);
+        color: white;
+      }
+
+      .dropdown-divider {
+        height: 1px;
+        background: var(--border-color);
+        margin: 5px 0;
+      }
+
       /* 响应式设计 */
       @media (max-width: 768px) {
         .stat-item {
@@ -732,6 +779,50 @@
           <i class="fas fa-bell"></i> 通知
         </button>
         <div class="notification-badge" id="notification-badge">0</div>
+      </div>
+
+      <div
+        class="btn-dropdown"
+        style="position: relative; display: inline-block"
+      >
+        <button
+          class="btn btn-import-export"
+          onclick="toggleImportExportMenu()"
+        >
+          <i class="fas fa-file-export"></i> 数据管理
+        </button>
+        <div
+          id="import-export-menu"
+          class="dropdown-menu"
+          style="
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            z-index: 1000;
+            background: var(--bg-color);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-lg);
+            min-width: 180px;
+            margin-top: 5px;
+          "
+        >
+          <button class="dropdown-item" onclick="exportTasks()">
+            <i class="fas fa-download"></i> 导出任务
+          </button>
+          <button class="dropdown-item" onclick="importTasks()">
+            <i class="fas fa-upload"></i> 导入任务
+          </button>
+          <div
+            style="height: 1px; background: var(--border-color); margin: 5px 0"
+          ></div>
+          <button class="dropdown-item" onclick="backupAllData()">
+            <i class="fas fa-save"></i> 完整备份
+          </button>
+          <button class="dropdown-item" onclick="restoreFromBackup()">
+            <i class="fas fa-history"></i> 恢复备份
+          </button>
+        </div>
       </div>
     </div>
 
@@ -963,6 +1054,181 @@
         JSON.parse(localStorage.getItem("notifications")) || [];
       let draggedItem = null; // 当前拖动的任务项
 
+      // 在脚本的开头添加（在 DOMContentLoaded 事件监听器之前）
+      function exportTasks() {
+        const dataStr = JSON.stringify(tasks, null, 2);
+        const dataUri =
+          "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
+
+        const exportFileDefaultName = `任务清单_${new Date().toISOString().split("T")[0]}.json`;
+
+        const linkElement = document.createElement("a");
+        linkElement.setAttribute("href", dataUri);
+        linkElement.setAttribute("download", exportFileDefaultName);
+        linkElement.click();
+
+        toastr.success("任务已成功导出！");
+      }
+
+      function importTasks() {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = ".json";
+
+        input.onchange = function (e) {
+          const file = e.target.files[0];
+          if (!file) return;
+
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            try {
+              const importedTasks = JSON.parse(event.target.result);
+
+              // 验证导入的数据格式
+              if (!Array.isArray(importedTasks)) {
+                throw new Error("导入的数据格式不正确");
+              }
+
+              // 检查是否需要合并或替换
+              if (tasks.length > 0) {
+                if (
+                  confirm(
+                    `当前有 ${tasks.length} 个任务，导入的 ${importedTasks.length} 个任务将：\n\n1. 添加到现有任务中\n2. 替换现有任务\n\n请点击"确定"进行合并添加，或点击"取消"进行替换。`,
+                  )
+                ) {
+                  // 合并任务（添加不重复的任务）
+                  const existingIds = tasks.map((task) => task.id);
+                  importedTasks.forEach((task) => {
+                    if (!existingIds.includes(task.id)) {
+                      tasks.push(task);
+                    }
+                  });
+                } else {
+                  // 替换任务
+                  tasks = importedTasks;
+                }
+              } else {
+                // 直接导入
+                tasks = importedTasks;
+              }
+
+              // 重新计算ID以避免冲突
+              const maxId = Math.max(...tasks.map((task) => task.id || 0), 0);
+              tasks.forEach((task) => {
+                if (!task.id || task.id <= maxId) {
+                  task.id = Date.now() + Math.floor(Math.random() * 1000);
+                }
+              });
+
+              saveTasks();
+              renderTasks();
+              updateStats();
+              updateProgress();
+
+              toastr.success(`成功导入 ${importedTasks.length} 个任务！`);
+            } catch (error) {
+              toastr.error("导入失败：" + error.message);
+              console.error("导入错误：", error);
+            }
+          };
+
+          reader.readAsText(file);
+        };
+
+        input.click();
+      }
+
+      function backupAllData() {
+        const backupData = {
+          tasks: tasks,
+          notifications: notifications,
+          darkMode: localStorage.getItem("darkMode") === "true",
+          lastResetDate: localStorage.getItem("lastResetDate"),
+          backupDate: new Date().toISOString(),
+        };
+
+        const dataStr = JSON.stringify(backupData, null, 2);
+        const dataUri =
+          "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
+
+        const exportFileDefaultName = `任务清单备份_${new Date().toISOString().split("T")[0]}.json`;
+
+        const linkElement = document.createElement("a");
+        linkElement.setAttribute("href", dataUri);
+        linkElement.setAttribute("download", exportFileDefaultName);
+        linkElement.click();
+
+        toastr.success("完整数据已备份！");
+      }
+
+      function restoreFromBackup() {
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = ".json";
+
+        input.onchange = function (e) {
+          const file = e.target.files[0];
+          if (!file) return;
+
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            try {
+              const backupData = JSON.parse(event.target.result);
+
+              // 验证备份数据格式
+              if (!backupData.tasks || !Array.isArray(backupData.tasks)) {
+                throw new Error("备份文件格式不正确");
+              }
+
+              if (confirm("警告：这将覆盖所有现有数据！确定要恢复备份吗？")) {
+                // 恢复任务
+                tasks = backupData.tasks;
+
+                // 恢复通知（如果有）
+                if (backupData.notifications) {
+                  notifications = backupData.notifications;
+                  saveNotifications();
+                }
+
+                // 恢复暗黑模式设置
+                if (backupData.darkMode) {
+                  document.body.classList.add("dark-mode");
+                  localStorage.setItem("darkMode", "true");
+                } else {
+                  document.body.classList.remove("dark-mode");
+                  localStorage.setItem("darkMode", "false");
+                }
+
+                // 恢复每日重置日期
+                if (backupData.lastResetDate) {
+                  localStorage.setItem(
+                    "lastResetDate",
+                    backupData.lastResetDate,
+                  );
+                }
+
+                saveTasks();
+                renderTasks();
+                updateStats();
+                updateProgress();
+                updateNotificationBadge();
+
+                toastr.success(
+                  `成功从备份恢复 ${backupData.tasks.length} 个任务！`,
+                );
+              }
+            } catch (error) {
+              toastr.error("恢复备份失败：" + error.message);
+              console.error("恢复错误：", error);
+            }
+          };
+
+          reader.readAsText(file);
+        };
+
+        input.click();
+      }
+
       // DOM加载完成后初始化
       document.addEventListener("DOMContentLoaded", function () {
         renderTasks();
@@ -1044,7 +1310,7 @@
 
           taskList.insertBefore(
             draggedItem,
-            next ? targetItem.nextSibling : targetItem
+            next ? targetItem.nextSibling : targetItem,
           );
         });
 
@@ -1143,7 +1409,7 @@
           : "无截止日期";
 
         document.getElementById("detail-created").textContent = new Date(
-          task.createdAt
+          task.createdAt,
         ).toLocaleString("zh-CN");
 
         // 渲染子任务
@@ -1167,9 +1433,8 @@
       // 打开删除确认模态窗口
       function openConfirmModal(taskId, taskTitle) {
         taskToDeleteId = taskId;
-        document.getElementById(
-          "confirm-message"
-        ).textContent = `确定要删除任务"${taskTitle}"吗？`;
+        document.getElementById("confirm-message").textContent =
+          `确定要删除任务"${taskTitle}"吗？`;
         document.getElementById("confirm-modal").style.display = "block";
       }
 
@@ -1479,10 +1744,10 @@
             const categorySpan = document.createElement("span");
             categorySpan.className = "task-category";
             categorySpan.innerHTML = `<i class="${getCategoryIcon(
-              task.category
+              task.category,
             )}"></i> ${getCategoryName(task.category)}`;
             categorySpan.style.backgroundColor = getCategoryColor(
-              task.category
+              task.category,
             );
             taskMeta.appendChild(categorySpan);
           }
@@ -1493,7 +1758,7 @@
             task.priority || "medium"
           }`;
           prioritySpan.innerHTML = `<i class="${getPriorityIcon(
-            task.priority || "medium"
+            task.priority || "medium",
           )}"></i> ${getPriorityName(task.priority || "medium")}`;
           taskMeta.appendChild(prioritySpan);
 
@@ -1504,7 +1769,7 @@
             if (task.due) {
               const dueDate = new Date(task.due);
               dueSpan.innerHTML = `<i class="far fa-calendar-alt"></i> ${dueDate.toLocaleDateString(
-                "zh-CN"
+                "zh-CN",
               )}`;
               if (isOverdue) {
                 dueSpan.style.color = "var(--danger-color)";
@@ -1518,7 +1783,7 @@
           // 子任务数量指示
           if (task.subtasks && task.subtasks.length > 0) {
             const completedSubtasks = task.subtasks.filter(
-              (st) => st.completed
+              (st) => st.completed,
             ).length;
             const subtaskIndicator = document.createElement("span");
             subtaskIndicator.className = "task-due";
@@ -1602,9 +1867,8 @@
           taskList.appendChild(li);
         });
 
-        document.getElementById(
-          "task-count"
-        ).textContent = `${tasks.length} 项`;
+        document.getElementById("task-count").textContent =
+          `${tasks.length} 项`;
       }
 
       // 获取分类图标
@@ -1706,7 +1970,7 @@
       function deleteTask(taskId) {
         openConfirmModal(
           taskId,
-          tasks.find((t) => t.id === taskId)?.title || ""
+          tasks.find((t) => t.id === taskId)?.title || "",
         );
       }
 
@@ -1750,9 +2014,8 @@
 
         const progressBar = document.getElementById("progress-bar");
         progressBar.style.width = `${percentage}%`;
-        document.getElementById(
-          "progress-text"
-        ).textContent = `${percentage}% 完成`;
+        document.getElementById("progress-text").textContent =
+          `${percentage}% 完成`;
 
         // 根据进度调整颜色
         if (percentage > 70) {
@@ -1818,7 +2081,7 @@
         document.body.classList.toggle("dark-mode");
         localStorage.setItem(
           "darkMode",
-          document.body.classList.contains("dark-mode")
+          document.body.classList.contains("dark-mode"),
         );
       }
 
@@ -1835,7 +2098,7 @@
             if (diffHours <= 24 && diffHours > 0) {
               addNotification(
                 `任务 "${task.title}" 即将到期，剩余${diffHours}小时！`,
-                "warning"
+                "warning",
               );
             } else if (dueDate < now) {
               addNotification(`任务 "${task.title}" 已过期！`, "error");
@@ -1851,7 +2114,7 @@
       function addNotification(message, type) {
         // 检查是否已存在相同通知
         const exists = notifications.some(
-          (n) => n.message === message && !n.read
+          (n) => n.message === message && !n.read,
         );
         if (exists) return;
 
@@ -1930,7 +2193,7 @@
             time.style.fontSize = "0.8em";
             time.style.color = "var(--text-light)";
             time.textContent = new Date(notification.timestamp).toLocaleString(
-              "zh-CN"
+              "zh-CN",
             );
 
             content.appendChild(message);
@@ -1962,6 +2225,27 @@
       function closeNotificationModal() {
         document.getElementById("notification-modal").style.display = "none";
       }
+
+      // 在脚本中添加这个函数
+      function toggleImportExportMenu() {
+        const menu = document.getElementById("import-export-menu");
+        menu.style.display = menu.style.display === "block" ? "none" : "block";
+      }
+
+      // 点击其他地方关闭下拉菜单
+      document.addEventListener("click", function (event) {
+        const menu = document.getElementById("import-export-menu");
+        const btn = document.querySelector(".btn-import-export");
+
+        if (
+          menu &&
+          btn &&
+          !menu.contains(event.target) &&
+          !btn.contains(event.target)
+        ) {
+          menu.style.display = "none";
+        }
+      });
 
       // 初始化toastr通知样式
       toastr.options = {
