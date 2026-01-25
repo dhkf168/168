@@ -5,8 +5,6 @@ let nextTextId =
 
 // 完整解析函数
 function parseTxtContent(txtContent) {
-  console.log("开始完整版TXT解析...");
-
   const lines = txtContent.split("\n");
   const parsedItems = [];
   let currentCard = null;
@@ -74,7 +72,6 @@ function parseTxtContent(txtContent) {
       parentId: null,
       createdAt: new Date().toISOString(),
     };
-    console.log("  开始新卡片");
   }
 
   // 开始新内容项
@@ -86,14 +83,12 @@ function parseTxtContent(txtContent) {
       type: "content",
       text: cleanText(line),
     };
-    console.log("  开始新内容项:", currentContentItem.text.substring(0, 40));
   }
 
   // 添加到当前内容项
   function addToCurrentContentItem(line) {
     if (currentContentItem) {
       currentContentItem.text += "\n" + cleanText(line);
-      console.log("  添加到当前内容项:", cleanText(line).substring(0, 40));
     } else {
       startNewContentItem(line);
     }
@@ -104,7 +99,6 @@ function parseTxtContent(txtContent) {
     if (currentContentItem && currentContentItem.text.trim().length > 0) {
       if (currentCard) {
         currentCard.content.push(currentContentItem);
-        console.log("  结束内容项，添加到卡片");
       }
     }
     currentContentItem = null;
@@ -117,7 +111,6 @@ function parseTxtContent(txtContent) {
 
     if (currentCard && currentCard.content.length > 0) {
       parsedItems.push(currentCard);
-      console.log("  结束卡片，添加到项目列表");
       currentCard = null;
     }
   }
@@ -148,7 +141,6 @@ function parseTxtContent(txtContent) {
         parentId: null,
         createdAt: new Date().toISOString(),
       });
-      console.log(`  添加${type}: ${text.substring(0, 40)}`);
     }
   }
 
@@ -172,7 +164,6 @@ function parseTxtContent(txtContent) {
         parentId: null,
         createdAt: new Date().toISOString(),
       });
-      console.log(`  添加h5标题: ${text.substring(0, 40)}`);
     }
   }
 
@@ -198,7 +189,6 @@ function parseTxtContent(txtContent) {
       parsedItems.push(h6Item);
       lastH6Item = h6Item; // 记录最近的h6
       currentH6Item = h6Item;
-      console.log(`  添加h6标题: ${text.substring(0, 40)}`);
     }
   }
 
@@ -220,7 +210,6 @@ function parseTxtContent(txtContent) {
       };
 
       lastH6Item.children.push(hhItem);
-      console.log(`  添加hh项到h6: ${text.substring(0, 40)}`);
     }
   }
 
@@ -250,7 +239,6 @@ function parseTxtContent(txtContent) {
       parentId: null,
       createdAt: new Date().toISOString(),
     });
-    console.log(`  添加图片: ${filename}`);
   }
 
   // 主要解析逻辑
@@ -258,11 +246,8 @@ function parseTxtContent(txtContent) {
     const line = lines[i];
     const trimmedLine = line.trim();
 
-    console.log(`行 ${i + 1}: "${line}"`);
-
     // 空行处理
     if (trimmedLine.length === 0) {
-      console.log("  空行，结束当前卡片");
       endCurrentCard();
       currentH6Item = null; // 空行也清除当前h6
       continue;
@@ -335,7 +320,6 @@ function parseTxtContent(txtContent) {
       // 非span行
       if (inSpanSequence) {
         // 之前在span序列中，现在结束了
-        console.log("  span序列结束，开始新内容项");
         endCurrentContentItem();
         startNewContentItem(line);
       } else if (currentContentItem) {
@@ -345,17 +329,14 @@ function parseTxtContent(txtContent) {
 
         if (prevIsSpan && prevLine.trim().length > 0) {
           // 上一行是span，当前行合并
-          console.log("  上一行是span，当前行合并");
           addToCurrentContentItem(line);
         } else {
           // 独立内容，开始新内容项
-          console.log("  独立内容，开始新内容项");
           endCurrentContentItem();
           startNewContentItem(line);
         }
       } else {
         // 没有当前内容项，开始新的
-        console.log("  开始第一个内容项");
         startNewContentItem(line);
       }
     }
@@ -367,19 +348,14 @@ function parseTxtContent(txtContent) {
 
     if (nextTrimmed.length === 0) {
       // 下一行是空行：内容项在endCurrentCard中处理
-      console.log("  下一行是空行");
     } else if (!isSpan && !nextIsSpan) {
       // 当前和下一行都是非span普通行：结束当前内容项
-      console.log("  当前和下一行都是非span普通行，结束当前内容项");
       endCurrentContentItem();
     }
   }
 
   // 处理最后的内容
   endCurrentCard();
-
-  console.log("\n=== 解析完成 ===");
-  console.log(`共解析出 ${parsedItems.length} 个项目`);
 
   // 统计信息
   const stats = {
@@ -399,16 +375,6 @@ function parseTxtContent(txtContent) {
       0,
     ),
   };
-
-  console.log("\n=== 统计信息 ===");
-  console.log(`大标题(h3): ${stats.mainTitles}`);
-  console.log(`小标题(h4): ${stats.subtitles}`);
-  console.log(`h5标题: ${stats.h5Titles}`);
-  console.log(`h6标题: ${stats.h6Titles}`);
-  console.log(`hh子项: ${stats.hhItems}`);
-  console.log(`图片卡片: ${stats.imageCards}`);
-  console.log(`内容卡片: ${stats.contentCards}`);
-  console.log(`内容项总数: ${stats.contentItems}`);
 
   // 保存最新的ID
   localStorage.setItem("contentSystemNextTextId", nextTextId.toString());
@@ -575,8 +541,6 @@ function previewTxtFileComplete(file) {
 
 // 测试函数
 function testCompleteParser() {
-  console.log("=== 测试完整解析器 ===");
-
   const exampleContent = `### 项目概述
 
 这是一个测试文档，用于演示TXT文件的完整解析功能。
@@ -610,21 +574,15 @@ span自动化测试覆盖率
 
 感谢大家的辛勤工作！`;
 
-  console.log("测试内容:");
   console.log(exampleContent);
 
   const parsed = parseTxtContent(exampleContent);
-
-  console.log("\n解析完成!");
-  console.log(`共解析出 ${parsed.length} 个项目`);
 
   return parsed;
 }
 
 // 初始化
 function initTxtImportFunctions() {
-  console.log("初始化完整版TXT解析功能...");
-
   // 更新界面提示
   const importFileArea = document.getElementById("importFileArea");
   if (importFileArea) {
@@ -644,12 +602,9 @@ function initTxtImportFunctions() {
   if (importFileInput) {
     importFileInput.accept = ".json,.txt,.text";
   }
-
-  console.log("完整版TXT解析功能已初始化");
 }
 
 // 运行测试
-console.log("=== 运行完整版测试 ===");
 testCompleteParser();
 
 // 导出
