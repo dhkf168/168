@@ -1709,160 +1709,334 @@ function exportData() {
 }
 
 // 预览导入文件
-// 预览导入文件
+// 预览导入文件 - 修复版
 function previewImportFile(file) {
   const previewArea = importPreview;
   previewArea.innerHTML = "";
+  previewArea.dataset.parsedData = "";
 
   if (!file) {
     previewArea.innerHTML = "<p>预览区域</p>";
     return;
   }
 
-  // 清除之前的数据
-  previewArea.dataset.parsedData = "";
-
   const reader = new FileReader();
   reader.onload = function (e) {
     try {
-      // 根据文件类型处理
-      if (file.name.toLowerCase().endsWith(".json")) {
-        // JSON文件处理
-        const data = JSON.parse(e.target.result);
+      const fileName = file.name.toLowerCase();
+      const fileContent = e.target.result;
+
+      // 清除之前的数据
+      previewArea.innerHTML = "";
+      previewArea.dataset.parsedData = "";
+
+      if (fileName.endsWith(".json")) {
+        // JSON文件处理 - 改为显示解析后的概览
+        const data = JSON.parse(fileContent);
 
         if (!data.contentItems || !Array.isArray(data.contentItems)) {
-          throw new Error("无效的JSON数据格式");
+          throw new Error("无效的JSON数据格式：缺少contentItems数组");
         }
 
-        let previewText = "=== JSON文件预览 ===\n\n";
-        data.contentItems.forEach((item) => {
-          if (item.type === "main-title") {
-            previewText += `• [大标题] ${item.text}\n`;
-          } else if (item.type === "subtitle") {
-            previewText += `  [小标题] ${item.text}\n`;
-          } else if (item.type === "content-card") {
-            previewText += `  [内容卡片] ${item.content?.length || 0} 条内容\n`;
-          } else if (item.type === "image-card") {
-            previewText += `  [图片卡片] ${item.images?.length || 0} 张图片\n`;
+        let previewHTML = `
+          <div style="text-align: left; padding: 10px; max-height: 200px; overflow-y: auto;">
+            <h4 style="margin: 0 0 10px 0; color: #ffcc00;">✅ JSON文件可导入</h4>
+            <div style="color: #ccc; font-size: 0.9em; margin-bottom: 10px;">
+              文件大小: ${formatFileSize(file.size)}<br>
+              数据版本: ${data.version || "未知"}
+            </div>
+            <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; margin-bottom: 10px;">
+              <strong>数据概览：</strong><br>
+        `;
+
+        // 统计各类内容数量
+        const mainTitles = data.contentItems.filter(
+          (item) => item.type === "main-title"
+        ).length;
+        const subtitles = data.contentItems.filter(
+          (item) => item.type === "subtitle"
+        ).length;
+        const contentCards = data.contentItems.filter(
+          (item) => item.type === "content-card"
+        ).length;
+        const imageCards = data.contentItems.filter(
+          (item) => item.type === "image-card"
+        ).length;
+
+        previewHTML += `
+          • 大标题: ${mainTitles} 个<br>
+          • 小标题: ${subtitles} 个<br>
+          • 内容卡片: ${contentCards} 个<br>
+          • 图片卡片: ${imageCards} 个<br>
+          <strong>总计: ${data.contentItems.length} 个项目</strong>
+        `;
+
+        // 显示前3个项目作为示例
+        const sampleCount = Math.min(3, data.contentItems.length);
+        if (sampleCount > 0) {
+          previewHTML += `
+            <div style="margin-top: 10px; border-top: 1px dashed #555; padding-top: 10px;">
+              <strong>示例内容（前${sampleCount}项）：</strong>
+          `;
+
+          for (let i = 0; i < sampleCount; i++) {
+            const item = data.contentItems[i];
+            previewHTML += `<div style="margin-top: 5px; font-size: 0.85em;">`;
+            
+            if (item.type === "main-title") {
+              previewHTML += `📌 <strong>大标题:</strong> "${item.text.substring(0, 30)}${item.text.length > 30 ? "..." : ""}"`;
+            } else if (item.type === "subtitle") {
+              previewHTML += `🔹 <strong>小标题:</strong> "${item.text.substring(0, 30)}${item.text.length > 30 ? "..." : ""}"`;
+            } else if (item.type === "content-card") {
+              const itemCount = item.content?.length || 0;
+              previewHTML += `📄 <strong>内容卡片:</strong> ${itemCount}条内容`;
+              if (item.content && item.content.length > 0) {
+                previewHTML += `，示例: "${item.content[0].text.substring(0, 30)}${item.content[0].text.length > 30 ? "..." : ""}"`;
+              }
+            } else if (item.type === "image-card") {
+              const imgCount = item.images?.length || 0;
+              previewHTML += `🖼️ <strong>图片卡片:</strong> ${imgCount}张图片`;
+              if (item.images && item.images.length > 0) {
+                previewHTML += `，示例: ${item.images[0].filename || "未命名"}`;
+              }
+            }
+            
+            previewHTML += `</div>`;
           }
-        });
+          
+          previewHTML += `</div>`;
+        }
 
-        previewText += `\n总计: ${data.contentItems.length} 个项目`;
-        previewArea.textContent = previewText;
+        // 检查是否有背景和主题设置
+        if (data.currentBackground) {
+          previewHTML += `
+            <div style="margin-top: 10px; border-top: 1px dashed #555; padding-top: 10px; color: #aaa; font-size: 0.85em;">
+              ⚙️ <strong>包含设置：</strong> 
+              ${data.currentBackground.type !== "none" ? "背景" : ""}
+              ${data.isLightMode !== undefined ? "主题" : ""}
+              ${data.backgroundOpacity ? "透明度" : ""}
+            </div>
+          `;
+        }
 
-        // 保存数据用于导入
+        previewHTML += `
+            </div>
+            <div style="color: #4caf50; font-size: 0.9em; margin-top: 10px;">
+              <i class="fas fa-check-circle"></i> 文件格式正确，可以导入
+            </div>
+          </div>
+        `;
+
+        previewArea.innerHTML = previewHTML;
+        
+        // 保存完整的解析数据用于导入
         previewArea.dataset.parsedData = JSON.stringify(data);
-      } else if (
-        file.name.toLowerCase().endsWith(".txt") ||
-        file.name.toLowerCase().endsWith(".text")
-      ) {
+
+      } else if (fileName.endsWith(".txt") || fileName.endsWith(".text")) {
         // TXT文件处理
-        const txtContent = e.target.result;
-
-        // 使用新的解析器
         if (typeof parseTxtContent !== "undefined") {
-          // 解析内容
-          const parsedItems = parseTxtContent(txtContent);
-
-          // 生成预览
-          let previewText = "=== TXT文件智能解析 ===\n\n";
-
-          // 解析规则说明
-          previewText += "【解析规则】\n";
-          previewText += "• ### 或 h3 → 大标题（生成左侧导航）\n";
-          previewText += "• #### 或 h4/h5 → 小标题\n";
-          previewText += "• ./path/image.jpg → 图片卡片\n";
-          previewText += "• 连续文本（无空行）→ 同一卡片\n";
-          previewText += "• 空行分隔 → 新卡片开始\n\n";
+          const parsedItems = parseTxtContent(fileContent);
+          
+          let previewHTML = `
+            <div style="text-align: left; padding: 10px;">
+              <h4 style="margin: 0 0 10px 0; color: #4caf50;">📝 TXT文件智能解析</h4>
+              <div style="color: #ccc; font-size: 0.9em; margin-bottom: 10px;">
+                文件大小: ${formatFileSize(file.size)}<br>
+                解析模式: 智能识别
+              </div>
+              <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px;">
+                <strong>解析结果统计：</strong><br>
+          `;
 
           // 统计信息
           const titles = parsedItems.filter(
-            (item) => item.type === "main-title",
+            (item) => item.type === "main-title"
           ).length;
           const subtitles = parsedItems.filter(
-            (item) => item.type === "subtitle",
+            (item) => item.type === "subtitle"
           ).length;
           const images = parsedItems.filter(
-            (item) => item.type === "image-card",
+            (item) => item.type === "image-card"
           ).length;
           const contentCards = parsedItems.filter(
-            (item) => item.type === "content-card",
+            (item) => item.type === "content-card"
           ).length;
 
-          previewText += "【统计信息】\n";
-          previewText += `大标题: ${titles} 个\n`;
-          previewText += `小标题: ${subtitles} 个\n`;
-          previewText += `图片卡片: ${images} 个\n`;
-          previewText += `内容卡片: ${contentCards} 个\n`;
-          previewText += `总计项目: ${parsedItems.length} 个\n\n`;
+          previewHTML += `
+            • 大标题: ${titles} 个<br>
+            • 小标题: ${subtitles} 个<br>
+            • 图片卡片: ${images} 个<br>
+            • 内容卡片: ${contentCards} 个<br>
+            <strong>总计项目: ${parsedItems.length} 个</strong>
+          `;
 
-          // 显示目录
-          if (titles > 0) {
-            previewText += "【目录结构】\n";
-            parsedItems
-              .filter((item) => item.type === "main-title")
-              .forEach((item, index) => {
-                previewText += `${index + 1}. ${item.text}\n`;
-              });
-            previewText += "\n";
-          }
+          // 显示前2个项目作为示例
+          const sampleCount = Math.min(2, parsedItems.length);
+          if (sampleCount > 0) {
+            previewHTML += `
+              <div style="margin-top: 10px; border-top: 1px dashed #555; padding-top: 10px;">
+                <strong>示例内容：</strong>
+            `;
 
-          // 显示内容示例
-          if (parsedItems.length > 0) {
-            previewText += "【内容示例】\n";
-            const sampleCount = Math.min(3, parsedItems.length);
             for (let i = 0; i < sampleCount; i++) {
               const item = parsedItems[i];
-              previewText += `${i + 1}. [${item.type}] `;
-
+              previewHTML += `<div style="margin-top: 5px; font-size: 0.85em;">`;
+              
               if (item.type === "main-title") {
-                previewText += `"${item.text}"\n`;
+                previewHTML += `📌 <strong>大标题:</strong> "${item.text.substring(0, 40)}${item.text.length > 40 ? "..." : ""}"`;
               } else if (item.type === "subtitle") {
-                previewText += `"${item.text}"\n`;
+                previewHTML += `🔹 <strong>小标题:</strong> "${item.text.substring(0, 40)}${item.text.length > 40 ? "..." : ""}"`;
               } else if (item.type === "content-card") {
-                previewText += `包含 ${item.content?.length || 0} 条内容\n`;
+                const itemCount = item.content?.length || 0;
+                previewHTML += `📄 <strong>内容卡片:</strong> ${itemCount}条内容`;
                 if (item.content && item.content.length > 0) {
-                  previewText += `  示例: "${item.content[0].text.substring(0, 50)}${item.content[0].text.length > 50 ? "..." : ""}"\n`;
+                  previewHTML += `，示例: "${item.content[0].text.substring(0, 40)}${item.content[0].text.length > 40 ? "..." : ""}"`;
                 }
-              } else if (item.type === "image-card") {
-                previewText += `图片: ${item.images?.[0]?.filename || "未命名"}\n`;
               }
+              
+              previewHTML += `</div>`;
             }
-
-            if (parsedItems.length > sampleCount) {
-              previewText += `... 还有 ${parsedItems.length - sampleCount} 个项目\n`;
-            }
+            
+            previewHTML += `</div>`;
           }
 
-          previewArea.textContent = previewText;
+          previewHTML += `
+              </div>
+              <div style="color: #4caf50; font-size: 0.9em; margin-top: 10px;">
+                <i class="fas fa-check-circle"></i> 解析成功，可以导入
+              </div>
+            </div>
+          `;
 
+          previewArea.innerHTML = previewHTML;
+          
           // 保存解析数据
           previewArea.dataset.parsedData = JSON.stringify({
             contentItems: parsedItems,
             parsedFromTxt: true,
             originalFileType: "txt",
           });
-        } else {
-          // 基本TXT预览
-          const lines = txtContent
-            .split("\n")
-            .filter((line) => line.trim().length > 0);
-          previewArea.textContent = `TXT文件检测到 ${lines.length} 行非空文本\n\n请确保已加载智能解析功能`;
         }
+      } else if (fileName.endsWith(".csv")) {
+        // CSV文件处理
+        const parsedItems = parseCSVContent(fileContent);
+        
+        let previewHTML = `
+          <div style="text-align: left; padding: 10px;">
+            <h4 style="margin: 0 0 10px 0; color: #ff9800;">📊 CSV文件解析</h4>
+            <div style="color: #ccc; font-size: 0.9em; margin-bottom: 10px;">
+              文件大小: ${formatFileSize(file.size)}
+            </div>
+            <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px;">
+              <strong>解析结果统计：</strong><br>
+        `;
+
+        // 统计信息
+        const titles = parsedItems.filter(
+          (item) => item.type === "main-title"
+        ).length;
+        const subtitles = parsedItems.filter(
+          (item) => item.type === "subtitle"
+        ).length;
+        const images = parsedItems.filter(
+          (item) => item.type === "image-card"
+        ).length;
+        const contentCards = parsedItems.filter(
+          (item) => item.type === "content-card"
+        ).length;
+
+        previewHTML += `
+          • 大标题: ${titles} 个<br>
+          • 小标题: ${subtitles} 个<br>
+          • 图片卡片: ${images} 个<br>
+          • 内容卡片: ${contentCards} 个<br>
+          <strong>总计项目: ${parsedItems.length} 个</strong>
+        `;
+
+        // 显示前2个项目作为示例
+        const sampleCount = Math.min(2, parsedItems.length);
+        if (sampleCount > 0) {
+          previewHTML += `
+            <div style="margin-top: 10px; border-top: 1px dashed #555; padding-top: 10px;">
+              <strong>示例内容：</strong>
+          `;
+
+          for (let i = 0; i < sampleCount; i++) {
+            const item = parsedItems[i];
+            previewHTML += `<div style="margin-top: 5px; font-size: 0.85em;">`;
+            
+            if (item.type === "main-title") {
+              previewHTML += `📌 <strong>大标题:</strong> "${item.text.substring(0, 40)}${item.text.length > 40 ? "..." : ""}"`;
+            } else if (item.type === "subtitle") {
+              previewHTML += `🔹 <strong>小标题:</strong> "${item.text.substring(0, 40)}${item.text.length > 40 ? "..." : ""}"`;
+            } else if (item.type === "content-card") {
+              const itemCount = item.content?.length || 0;
+              previewHTML += `📄 <strong>内容卡片:</strong> ${itemCount}条内容`;
+            }
+            
+            previewHTML += `</div>`;
+          }
+          
+          previewHTML += `</div>`;
+        }
+
+        previewHTML += `
+            </div>
+            <div style="color: #4caf50; font-size: 0.9em; margin-top: 10px;">
+              <i class="fas fa-check-circle"></i> 解析成功，可以导入
+            </div>
+          </div>
+        `;
+
+        previewArea.innerHTML = previewHTML;
+        
+        // 保存解析数据
+        previewArea.dataset.parsedData = JSON.stringify({
+          contentItems: parsedItems,
+          parsedFromCSV: true,
+          originalFileType: "csv",
+        });
       } else {
-        previewArea.innerHTML = `<p style="color: #ff6666;">不支持的文件格式，请选择JSON或TXT文件</p>`;
+        previewArea.innerHTML = `
+          <div style="text-align: center; padding: 20px; color: #ff6666;">
+            <i class="fas fa-exclamation-triangle" style="font-size: 2em; margin-bottom: 10px;"></i>
+            <p><strong>不支持的文件格式</strong></p>
+            <p style="font-size: 0.9em; color: #aaa;">请选择 JSON、TXT 或 CSV 文件</p>
+          </div>
+        `;
       }
     } catch (error) {
       console.error("文件预览失败:", error);
-      previewArea.innerHTML = `<p style="color: #ff6666;">文件解析失败: ${error.message}</p>`;
+      previewArea.innerHTML = `
+        <div style="text-align: center; padding: 20px; color: #ff6666;">
+          <i class="fas fa-exclamation-circle" style="font-size: 2em; margin-bottom: 10px;"></i>
+          <p><strong>文件解析失败</strong></p>
+          <p style="font-size: 0.9em; color: #aaa;">${error.message}</p>
+        </div>
+      `;
     }
   };
 
   reader.onerror = function () {
-    previewArea.innerHTML = `<p style="color: #ff6666;">文件读取失败</p>`;
+    previewArea.innerHTML = `
+      <div style="text-align: center; padding: 20px; color: #ff6666;">
+        <i class="fas fa-times-circle" style="font-size: 2em; margin-bottom: 10px;"></i>
+        <p><strong>文件读取失败</strong></p>
+        <p style="font-size: 0.9em; color: #aaa;">请检查文件是否损坏</p>
+      </div>
+    `;
   };
 
   reader.readAsText(file, "UTF-8");
+}
+
+// 辅助函数：格式化文件大小
+function formatFileSize(bytes) {
+  if (bytes === 0) return '0 Bytes';
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
 }
 
 // 导入数据
@@ -2699,5 +2873,6 @@ const VISUAL_EFFECTS = {
     }, 2000);
   },
 };
+
 
 
