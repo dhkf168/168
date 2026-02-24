@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>客服人数统计 · 独立头像 + 一键清除</title>
+    <title>客服人数统计 · 完整版（右键菜单+独立头像）</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <!-- 引入拖拽库 SortableJS -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
@@ -468,6 +468,59 @@
             grid-column: 1 / -1;
         }
 
+        /* 右键自定义菜单 */
+        .context-menu {
+            position: fixed;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            padding: 8px 0;
+            min-width: 160px;
+            z-index: 10000;
+            display: none;
+            border: 1px solid #e9ecef;
+        }
+
+        .context-menu ul {
+            list-style: none;
+        }
+
+        .context-menu li {
+            padding: 10px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #2d3436;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+
+        .context-menu li:hover {
+            background: #f1f3f5;
+            color: var(--primary);
+        }
+
+        .context-menu li i {
+            width: 20px;
+            color: var(--primary);
+        }
+
+        .context-menu li.delete-item:hover {
+            background: #fff5f5;
+            color: var(--danger);
+        }
+
+        .context-menu li.delete-item i {
+            color: var(--danger);
+        }
+
+        .context-menu hr {
+            margin: 8px 0;
+            border: none;
+            border-top: 1px solid #e9ecef;
+        }
+
         /* 模态框样式 */
         .modal {
             display: none;
@@ -573,7 +626,7 @@
             margin-top: 15px;
         }
 
-        /* 头像上传相关 - 新增一键清除按钮 */
+        /* 头像上传相关 */
         .avatar-upload-container {
             display: flex;
             align-items: center;
@@ -890,7 +943,7 @@
 <body>
 <div class="container">
     <header>
-        <h1><i class="fas fa-users-cog"></i> 客服人数统计 · 独立头像</h1>
+        <h1><i class="fas fa-users-cog"></i> 客服人数统计 · 完整版</h1>
         <div style="display: flex; gap: 10px">
             <button class="btn" id="export-btn"><i class="fas fa-file-export"></i> 导出数据</button>
             <button class="btn" id="import-btn"><i class="fas fa-file-import"></i> 导入数据</button>
@@ -948,7 +1001,7 @@
     </div>
 </div>
 
-<!-- 添加人员模态框 (带头像上传和一键清除) -->
+<!-- 添加人员模态框 -->
 <div class="modal" id="staff-modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -956,7 +1009,7 @@
             <button class="close-btn">&times;</button>
         </div>
         
-        <!-- 头像上传区域 - 新增一键清除按钮 -->
+        <!-- 头像上传区域 -->
         <div class="avatar-upload-container">
             <div class="avatar-preview" id="staff-avatar-preview">
                 <i class="fas fa-user"></i>
@@ -994,7 +1047,7 @@
     </div>
 </div>
 
-<!-- 成员详情模态框 (带头像上传和一键清除) -->
+<!-- 成员详情模态框 -->
 <div class="modal staff-details-modal" id="staff-details-modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -1002,7 +1055,7 @@
             <button class="close-btn">&times;</button>
         </div>
         
-        <!-- 头像上传区域 - 新增一键清除按钮 -->
+        <!-- 头像上传区域 -->
         <div class="detail-avatar-container">
             <div class="detail-avatar-preview" id="detail-avatar-preview">
                 <i class="fas fa-user"></i>
@@ -1109,6 +1162,13 @@
             <button class="btn" id="input-save">保存</button>
         </div>
     </div>
+</div>
+
+<!-- 右键自定义菜单 -->
+<div class="context-menu" id="contextMenu">
+    <ul id="contextMenuList">
+        <!-- 动态填充 -->
+    </ul>
 </div>
 
 <script>
@@ -1219,9 +1279,14 @@
         let currentRoles = [];
         let detailRoles = [];
 
-        // 当前正在编辑的头像数据 (base64) - 每个成员独立
+        // 当前正在编辑的头像数据
         let currentAvatar = null;
         let currentDetailAvatar = null;
+
+        // 右键菜单相关
+        const contextMenu = document.getElementById('contextMenu');
+        const contextMenuList = document.getElementById('contextMenuList');
+        let contextTarget = null; // 存储右键点击的目标对象
 
         // 初始化
         function initApp() {
@@ -1231,6 +1296,8 @@
             setupImportExportListeners();
             // 初始化拖拽
             initDragAndDrop();
+            // 初始化右键菜单
+            setupContextMenu();
         }
 
         // 导出导入相关
@@ -1378,6 +1445,7 @@
                 const moduleEl = document.createElement("div");
                 moduleEl.className = "module";
                 moduleEl.dataset.moduleId = module.id;
+                moduleEl.dataset.moduleName = module.name;
 
                 let positionsHTML = "";
                 module.positions.forEach(position => {
@@ -1402,7 +1470,7 @@
                             }
 
                             staffHTML += `
-                                <div class="staff-member" data-staff-id="${person.id}" data-module-id="${module.id}" data-position-id="${position.id}">
+                                <div class="staff-member" data-staff-id="${person.id}" data-staff-name="${person.name}" data-module-id="${module.id}" data-position-id="${position.id}">
                                     <div class="staff-avatar" ${avatarStyle}>${avatarContent}</div>
                                     <div class="staff-info">
                                         <div class="staff-name">${person.name}</div>
@@ -1419,7 +1487,7 @@
                     }
 
                     positionsHTML += `
-                        <div class="position" data-position-id="${position.id}" data-module-id="${module.id}">
+                        <div class="position" data-position-id="${position.id}" data-position-name="${position.name}" data-module-id="${module.id}">
                             <div class="position-header">
                                 <span class="position-title"><i class="fas fa-briefcase"></i> ${position.name}</span>
                                 <div class="position-actions">
@@ -1447,8 +1515,144 @@
             });
 
             bindModuleEvents();
-            // 重新初始化拖拽（因为DOM重新生成了）
+            // 重新初始化拖拽
             initDragAndDrop();
+            // 重新绑定右键菜单
+            bindContextMenuEvents();
+        }
+
+        // 绑定右键菜单事件
+        function bindContextMenuEvents() {
+            // 为小组绑定右键
+            document.querySelectorAll('.module').forEach(module => {
+                module.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const moduleId = module.dataset.moduleId;
+                    const moduleName = module.dataset.moduleName;
+                    const moduleData = modules.find(m => m.id == moduleId);
+                    
+                    showContextMenu(e, [
+                        {
+                            icon: 'fa-pen',
+                            text: '修改小组名称',
+                            action: () => showInput('修改小组名称', moduleName, (newName) => renameModule(moduleId, newName))
+                        },
+                        {
+                            icon: 'fa-trash',
+                            text: '删除小组',
+                            action: () => showConfirm(`确定删除小组 "${moduleName}" ？`, (confirmed) => confirmed && deleteModule(moduleId)),
+                            isDelete: true
+                        }
+                    ]);
+                });
+            });
+
+            // 为岗位绑定右键
+            document.querySelectorAll('.position').forEach(position => {
+                position.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const positionId = position.dataset.positionId;
+                    const positionName = position.dataset.positionName;
+                    const moduleId = position.dataset.moduleId;
+                    const module = modules.find(m => m.id == moduleId);
+                    const positionData = module?.positions.find(p => p.id == positionId);
+                    
+                    showContextMenu(e, [
+                        {
+                            icon: 'fa-pen',
+                            text: '修改岗位名称',
+                            action: () => showInput('修改岗位名称', positionName, (newName) => renamePosition(moduleId, positionId, newName))
+                        },
+                        {
+                            icon: 'fa-trash',
+                            text: '删除岗位',
+                            action: () => showConfirm(`确定删除岗位 "${positionName}" ？`, (confirmed) => confirmed && deletePosition(moduleId, positionId)),
+                            isDelete: true
+                        }
+                    ]);
+                });
+            });
+
+            // 为成员绑定右键
+            document.querySelectorAll('.staff-member').forEach(member => {
+                member.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const staffId = member.dataset.staffId;
+                    const staffName = member.dataset.staffName;
+                    const positionId = member.dataset.positionId;
+                    const moduleId = member.dataset.moduleId;
+                    const module = modules.find(m => m.id == moduleId);
+                    const position = module?.positions.find(p => p.id == positionId);
+                    const staff = position?.staff.find(s => s.id == staffId);
+                    
+                    showContextMenu(e, [
+                        {
+                            icon: 'fa-pen',
+                            text: '编辑成员',
+                            action: () => {
+                                if (staff) showStaffDetails(staff, moduleId, positionId, staffId);
+                            }
+                        },
+                        {
+                            icon: 'fa-trash',
+                            text: '删除成员',
+                            action: () => showConfirm(`确定删除成员 "${staffName}" ？`, (confirmed) => confirmed && deleteStaff(moduleId, positionId, staffId)),
+                            isDelete: true
+                        }
+                    ]);
+                });
+            });
+        }
+
+        // 显示右键菜单
+        function showContextMenu(e, items) {
+            e.preventDefault();
+            
+            // 构建菜单项
+            contextMenuList.innerHTML = '';
+            items.forEach(item => {
+                const li = document.createElement('li');
+                li.className = item.isDelete ? 'delete-item' : '';
+                li.innerHTML = `<i class="fas ${item.icon}"></i> ${item.text}`;
+                li.addEventListener('click', () => {
+                    item.action();
+                    contextMenu.style.display = 'none';
+                });
+                contextMenuList.appendChild(li);
+            });
+            
+            // 设置菜单位置
+            contextMenu.style.display = 'block';
+            contextMenu.style.left = e.pageX + 'px';
+            contextMenu.style.top = e.pageY + 'px';
+            
+            // 确保菜单不超出视口
+            const menuRect = contextMenu.getBoundingClientRect();
+            if (menuRect.right > window.innerWidth) {
+                contextMenu.style.left = (window.innerWidth - menuRect.width - 10) + 'px';
+            }
+            if (menuRect.bottom > window.innerHeight) {
+                contextMenu.style.top = (window.innerHeight - menuRect.height - 10) + 'px';
+            }
+        }
+
+        // 设置右键菜单全局事件
+        function setupContextMenu() {
+            // 点击其他地方关闭菜单
+            window.addEventListener('click', () => {
+                contextMenu.style.display = 'none';
+            });
+            
+            // 右键时先关闭其他菜单
+            window.addEventListener('contextmenu', () => {
+                contextMenu.style.display = 'none';
+            });
         }
 
         // 初始化拖拽功能
@@ -1458,7 +1662,7 @@
                 new Sortable(list, {
                     group: {
                         name: 'shared',
-                        pull: true,      // 可以从其他容器拖入
+                        pull: true,
                         revertClone: false
                     },
                     animation: 200,
@@ -1468,27 +1672,21 @@
                     chosenClass: 'sortable-chosen',
                     dragClass: 'sortable-drag',
                     onEnd: function(evt) {
-                        // 拖拽结束，更新数据模型
-                        const fromList = evt.from;                          // 源容器
-                        const toList = evt.to;                              // 目标容器
-                        const draggedItem = evt.item;                       // 被拖拽的DOM元素
+                        const fromList = evt.from;
+                        const toList = evt.to;
+                        const draggedItem = evt.item;
                         
                         const staffId = draggedItem.dataset.staffId;
                         
-                        // 从源容器的数据属性获取模块和岗位ID
                         const fromModuleId = fromList.dataset.moduleId;
                         const fromPositionId = fromList.dataset.positionId;
                         
-                        // 目标容器的模块和岗位ID
                         const toModuleId = toList.dataset.moduleId;
                         const toPositionId = toList.dataset.positionId;
                         
-                        // 如果源和目标相同，只做排序，不需要更新岗位归属
                         if (fromModuleId === toModuleId && fromPositionId === toPositionId) {
-                            // 只是排序，更新顺序
                             updateStaffOrder(toModuleId, toPositionId, toList);
                         } else {
-                            // 跨岗位或跨模块移动，需要更新人员的归属
                             moveStaff(staffId, fromModuleId, fromPositionId, toModuleId, toPositionId, toList);
                         }
                     }
@@ -1503,7 +1701,6 @@
             const position = module.positions.find(p => p.id == positionId);
             if (!position) return;
             
-            // 按照DOM顺序重新排列staff数组
             const newStaffOrder = [];
             list.querySelectorAll('.staff-member').forEach(item => {
                 const id = item.dataset.staffId;
@@ -1511,7 +1708,6 @@
                 if (staff) newStaffOrder.push(staff);
             });
             
-            // 确保数量一致
             if (newStaffOrder.length === position.staff.length) {
                 position.staff = newStaffOrder;
                 saveToLocalStorage();
@@ -1520,27 +1716,22 @@
 
         // 移动人员到新岗位
         function moveStaff(staffId, fromModuleId, fromPositionId, toModuleId, toPositionId, toList) {
-            // 找到源模块和岗位
             const fromModule = modules.find(m => m.id == fromModuleId);
             if (!fromModule) return;
             const fromPosition = fromModule.positions.find(p => p.id == fromPositionId);
             if (!fromPosition) return;
             
-            // 找到要移动的人员
             const staffIndex = fromPosition.staff.findIndex(s => s.id == staffId);
             if (staffIndex === -1) return;
             const staff = fromPosition.staff[staffIndex];
             
-            // 从源岗位移除
             fromPosition.staff.splice(staffIndex, 1);
             
-            // 添加到目标岗位
             const toModule = modules.find(m => m.id == toModuleId);
             if (!toModule) return;
             const toPosition = toModule.positions.find(p => p.id == toPositionId);
             if (!toPosition) return;
             
-            // 根据拖拽后的位置插入
             const targetIndex = Array.from(toList.children).indexOf(toList.querySelector(`[data-staff-id="${staffId}"]`));
             if (targetIndex >= 0) {
                 toPosition.staff.splice(targetIndex, 0, staff);
@@ -1549,7 +1740,6 @@
             }
             
             saveToLocalStorage();
-            // 不需要重新渲染，因为DOM已经由Sortable移动
         }
 
         // 绑定模块事件
@@ -1568,12 +1758,22 @@
                 });
             });
 
-            // 模块重命名
+            // 双击重命名 - 已经通过右键菜单实现，但保留双击作为备选
             document.querySelectorAll(".module-title").forEach(el => {
                 el.addEventListener("dblclick", (e) => {
                     const moduleId = e.target.closest(".module").dataset.moduleId;
                     const module = modules.find(m => m.id == moduleId);
                     showInput("修改模块名称", module.name, newName => renameModule(moduleId, newName));
+                });
+            });
+
+            document.querySelectorAll(".position-title").forEach(el => {
+                el.addEventListener("dblclick", (e) => {
+                    const positionId = e.target.closest(".position").dataset.positionId;
+                    const moduleId = e.target.closest(".module").dataset.moduleId;
+                    const module = modules.find(m => m.id == moduleId);
+                    const position = module.positions.find(p => p.id == positionId);
+                    showInput("修改岗位名称", position.name, newName => renamePosition(moduleId, positionId, newName));
                 });
             });
 
@@ -1591,17 +1791,6 @@
                 btn.addEventListener("click", (e) => {
                     currentModuleId = e.target.closest(".module").dataset.moduleId;
                     openModal("position-modal");
-                });
-            });
-
-            // 岗位重命名
-            document.querySelectorAll(".position-title").forEach(el => {
-                el.addEventListener("dblclick", (e) => {
-                    const positionId = e.target.closest(".position").dataset.positionId;
-                    const moduleId = e.target.closest(".module").dataset.moduleId;
-                    const module = modules.find(m => m.id == moduleId);
-                    const position = module.positions.find(p => p.id == positionId);
-                    showInput("修改岗位名称", position.name, newName => renamePosition(moduleId, positionId, newName));
                 });
             });
 
@@ -1675,10 +1864,11 @@
             document.getElementById("detail-name").value = staff.name;
             document.getElementById("detail-notes").value = staff.notes || "";
             
-            // 头像 - 独立设置
             currentDetailAvatar = staff.avatar || null;
             if (staff.avatar) {
                 document.getElementById("detail-avatar-preview").style.backgroundImage = `url('${staff.avatar}')`;
+                document.getElementById("detail-avatar-preview").style.backgroundSize = "cover";
+                document.getElementById("detail-avatar-preview").style.backgroundPosition = "center";
                 document.getElementById("detail-avatar-preview").innerHTML = '';
             } else {
                 document.getElementById("detail-avatar-preview").style.backgroundImage = '';
@@ -1751,7 +1941,7 @@
             });
         }
 
-        // 头像上传和一键清除功能
+        // 头像上传和一键清除
         function setupAvatarUpload() {
             // 添加成员模态框 - 上传
             document.getElementById("staff-avatar-upload-btn").addEventListener("click", () => {
@@ -1978,9 +2168,6 @@
 
             // 头像上传和一键清除
             setupAvatarUpload();
-
-            // 点击外部关闭 (可选)
-            // window.addEventListener("click", (e) => e.target.classList.contains("modal") && closeAllModals());
         }
 
         // 启动
