@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>客服人数统计 · 紧凑网格布局</title>
+    <title>客服人数统计 · 独立头像 + 一键清除</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <!-- 引入拖拽库 SortableJS -->
     <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
@@ -46,7 +46,7 @@
             margin: 0 auto;
             display: flex;
             flex-direction: column;
-            align-items: center; /* 整体居中 */
+            align-items: center;
         }
 
         header {
@@ -60,7 +60,7 @@
             border-radius: 12px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
             color: white;
-            width: 100%; /* 占满宽度 */
+            width: 100%;
         }
 
         h1 {
@@ -152,13 +152,12 @@
             text-align: center;
         }
 
-        /* 模块容器 - 网格布局，卡片居中 */
         .modules-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
             gap: 20px;
             width: 100%;
-            justify-content: center; /* 水平居中 */
+            justify-content: center;
         }
 
         .module {
@@ -312,7 +311,6 @@
             gap: 5px;
         }
 
-        /* 可拖拽区域 - 改为网格布局，更紧凑 */
         .staff-list {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
@@ -328,7 +326,6 @@
             cursor: grabbing;
         }
 
-        /* 成员卡片 - 头像左，信息右，尺寸更紧凑 */
         .staff-member {
             display: flex;
             align-items: center;
@@ -342,7 +339,7 @@
             border-left: 2px solid var(--position-color-1);
             cursor: grab;
             user-select: none;
-            min-width: 0; /* 防止溢出 */
+            min-width: 0;
         }
 
         .staff-member:active {
@@ -355,7 +352,6 @@
             border-left: 2px solid var(--secondary);
         }
 
-        /* 拖拽时的占位样式 */
         .staff-list .sortable-ghost {
             opacity: 0.4;
             background: #c8d9ff;
@@ -366,7 +362,6 @@
             box-shadow: 0 8px 16px rgba(0,0,0,0.2);
         }
 
-        /* 头像更小，适应紧凑布局 */
         .staff-avatar {
             width: 36px;
             height: 36px;
@@ -473,7 +468,7 @@
             grid-column: 1 / -1;
         }
 
-        /* 模态框样式保持不变 */
+        /* 模态框样式 */
         .modal {
             display: none;
             position: fixed;
@@ -578,12 +573,13 @@
             margin-top: 15px;
         }
 
-        /* 头像上传相关 */
+        /* 头像上传相关 - 新增一键清除按钮 */
         .avatar-upload-container {
             display: flex;
             align-items: center;
             gap: 15px;
             margin-bottom: 10px;
+            flex-wrap: wrap;
         }
 
         .avatar-preview {
@@ -620,6 +616,24 @@
 
         .avatar-upload-btn:hover {
             background: var(--secondary);
+        }
+
+        .avatar-clear-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+
+        .avatar-clear-btn:hover {
+            background: #5a6268;
         }
 
         #avatar-input, #staff-avatar-input, #detail-avatar-input {
@@ -701,6 +715,7 @@
             align-items: center;
             gap: 15px;
             margin-bottom: 15px;
+            flex-wrap: wrap;
         }
 
         .detail-avatar-preview {
@@ -736,6 +751,24 @@
 
         .detail-avatar-upload-btn:hover {
             background: var(--secondary);
+        }
+
+        .detail-avatar-clear-btn {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+
+        .detail-avatar-clear-btn:hover {
+            background: #5a6268;
         }
 
         /* 文件输入样式 */
@@ -857,7 +890,7 @@
 <body>
 <div class="container">
     <header>
-        <h1><i class="fas fa-users-cog"></i> 客服人数统计 · 紧凑网格</h1>
+        <h1><i class="fas fa-users-cog"></i> 客服人数统计 · 独立头像</h1>
         <div style="display: flex; gap: 10px">
             <button class="btn" id="export-btn"><i class="fas fa-file-export"></i> 导出数据</button>
             <button class="btn" id="import-btn"><i class="fas fa-file-import"></i> 导入数据</button>
@@ -915,7 +948,7 @@
     </div>
 </div>
 
-<!-- 添加人员模态框 (带头像上传) -->
+<!-- 添加人员模态框 (带头像上传和一键清除) -->
 <div class="modal" id="staff-modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -923,14 +956,19 @@
             <button class="close-btn">&times;</button>
         </div>
         
-        <!-- 头像上传区域 -->
+        <!-- 头像上传区域 - 新增一键清除按钮 -->
         <div class="avatar-upload-container">
             <div class="avatar-preview" id="staff-avatar-preview">
                 <i class="fas fa-user"></i>
             </div>
-            <button type="button" class="avatar-upload-btn" id="staff-avatar-upload-btn">
-                <i class="fas fa-camera"></i> 上传头像
-            </button>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button type="button" class="avatar-upload-btn" id="staff-avatar-upload-btn">
+                    <i class="fas fa-camera"></i> 上传头像
+                </button>
+                <button type="button" class="avatar-clear-btn" id="staff-avatar-clear-btn">
+                    <i class="fas fa-times"></i> 清除头像
+                </button>
+            </div>
             <input type="file" id="staff-avatar-input" accept="image/*" />
         </div>
 
@@ -956,7 +994,7 @@
     </div>
 </div>
 
-<!-- 成员详情模态框 (带头像上传) -->
+<!-- 成员详情模态框 (带头像上传和一键清除) -->
 <div class="modal staff-details-modal" id="staff-details-modal">
     <div class="modal-content">
         <div class="modal-header">
@@ -964,14 +1002,19 @@
             <button class="close-btn">&times;</button>
         </div>
         
-        <!-- 头像上传区域 -->
+        <!-- 头像上传区域 - 新增一键清除按钮 -->
         <div class="detail-avatar-container">
             <div class="detail-avatar-preview" id="detail-avatar-preview">
                 <i class="fas fa-user"></i>
             </div>
-            <button type="button" class="detail-avatar-upload-btn" id="detail-avatar-upload-btn">
-                <i class="fas fa-camera"></i> 更换头像
-            </button>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <button type="button" class="detail-avatar-upload-btn" id="detail-avatar-upload-btn">
+                    <i class="fas fa-camera"></i> 更换头像
+                </button>
+                <button type="button" class="detail-avatar-clear-btn" id="detail-avatar-clear-btn">
+                    <i class="fas fa-times"></i> 清除头像
+                </button>
+            </div>
             <input type="file" id="detail-avatar-input" accept="image/*" />
         </div>
 
@@ -1176,7 +1219,7 @@
         let currentRoles = [];
         let detailRoles = [];
 
-        // 当前正在编辑的头像数据 (base64)
+        // 当前正在编辑的头像数据 (base64) - 每个成员独立
         let currentAvatar = null;
         let currentDetailAvatar = null;
 
@@ -1506,8 +1549,7 @@
             }
             
             saveToLocalStorage();
-            // 不需要重新渲染，因为DOM已经由Sortable移动，但为了确保数据一致性，可以轻微更新
-            // 但为了保持拖拽流畅，不调用renderModules()
+            // 不需要重新渲染，因为DOM已经由Sortable移动
         }
 
         // 绑定模块事件
@@ -1633,7 +1675,7 @@
             document.getElementById("detail-name").value = staff.name;
             document.getElementById("detail-notes").value = staff.notes || "";
             
-            // 头像
+            // 头像 - 独立设置
             currentDetailAvatar = staff.avatar || null;
             if (staff.avatar) {
                 document.getElementById("detail-avatar-preview").style.backgroundImage = `url('${staff.avatar}')`;
@@ -1709,9 +1751,9 @@
             });
         }
 
-        // 头像上传
+        // 头像上传和一键清除功能
         function setupAvatarUpload() {
-            // 添加成员模态框
+            // 添加成员模态框 - 上传
             document.getElementById("staff-avatar-upload-btn").addEventListener("click", () => {
                 document.getElementById("staff-avatar-input").click();
             });
@@ -1722,13 +1764,23 @@
                     reader.onload = (event) => {
                         currentAvatar = event.target.result;
                         document.getElementById("staff-avatar-preview").style.backgroundImage = `url('${event.target.result}')`;
+                        document.getElementById("staff-avatar-preview").style.backgroundSize = "cover";
+                        document.getElementById("staff-avatar-preview").style.backgroundPosition = "center";
                         document.getElementById("staff-avatar-preview").innerHTML = '';
                     };
                     reader.readAsDataURL(file);
                 }
             });
 
-            // 详情模态框
+            // 添加成员模态框 - 清除
+            document.getElementById("staff-avatar-clear-btn").addEventListener("click", () => {
+                currentAvatar = null;
+                document.getElementById("staff-avatar-preview").style.backgroundImage = "";
+                document.getElementById("staff-avatar-preview").innerHTML = '<i class="fas fa-user"></i>';
+                document.getElementById("staff-avatar-input").value = "";
+            });
+
+            // 详情模态框 - 上传
             document.getElementById("detail-avatar-upload-btn").addEventListener("click", () => {
                 document.getElementById("detail-avatar-input").click();
             });
@@ -1739,10 +1791,20 @@
                     reader.onload = (event) => {
                         currentDetailAvatar = event.target.result;
                         document.getElementById("detail-avatar-preview").style.backgroundImage = `url('${event.target.result}')`;
+                        document.getElementById("detail-avatar-preview").style.backgroundSize = "cover";
+                        document.getElementById("detail-avatar-preview").style.backgroundPosition = "center";
                         document.getElementById("detail-avatar-preview").innerHTML = '';
                     };
                     reader.readAsDataURL(file);
                 }
+            });
+
+            // 详情模态框 - 清除
+            document.getElementById("detail-avatar-clear-btn").addEventListener("click", () => {
+                currentDetailAvatar = null;
+                document.getElementById("detail-avatar-preview").style.backgroundImage = "";
+                document.getElementById("detail-avatar-preview").innerHTML = '<i class="fas fa-user"></i>';
+                document.getElementById("detail-avatar-input").value = "";
             });
         }
 
@@ -1829,7 +1891,7 @@
                     staff.name = name;
                     staff.roles = [...currentRoles];
                     staff.notes = notes;
-                    if (currentAvatar) staff.avatar = currentAvatar;
+                    if (currentAvatar !== null) staff.avatar = currentAvatar;
                 }
             } else {
                 position.staff.push({
@@ -1837,7 +1899,7 @@
                     name,
                     roles: [...currentRoles],
                     notes,
-                    avatar: currentAvatar || null
+                    avatar: currentAvatar
                 });
             }
 
@@ -1860,7 +1922,7 @@
                 staff.name = name;
                 staff.roles = [...detailRoles];
                 staff.notes = notes;
-                if (currentDetailAvatar) staff.avatar = currentDetailAvatar;
+                if (currentDetailAvatar !== null) staff.avatar = currentDetailAvatar;
                 saveToLocalStorage();
                 renderModules();
                 closeAllModals();
@@ -1914,7 +1976,7 @@
                 document.getElementById("staff-details-modal").style.display = "none";
             });
 
-            // 头像上传
+            // 头像上传和一键清除
             setupAvatarUpload();
 
             // 点击外部关闭 (可选)
